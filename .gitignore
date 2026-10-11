@@ -1,0 +1,21 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Node (if the build step uses it)
+node_modules/
+npm-debug.log*
+
+# Secrets — never commit the push token / deploy key
+.env
+.env.*
+*.pem
+secrets.*
+
+# Build output (adjust once the build is defined)
+dist/
