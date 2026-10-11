@@ -133,11 +133,19 @@
     .cals.one .ev .t { font-size: 0.68rem; }
   }
 
+  /* Portrait / tall tile: stack months, each sized so at least two show at once; scroll for more. */
+  @media (orientation: portrait) {
+    .cals .cal { min-height: 44dvh; }
+    .cals .grid { flex: 1 1 auto; min-height: 0; grid-auto-rows: 1fr; }
+    .cals .cell { min-height: 0; }
+  }
+
   .cal {
     background: var(--surface);
     border: 1px solid var(--line);
     border-radius: 14px;
     padding: 14px 14px 16px;
+    display: flex; flex-direction: column;
   }
   .cal-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
   .cal-title {
@@ -618,6 +626,20 @@
     if (mq.addEventListener) {
       mq.addEventListener("change", function () { mode = singleMode(); render(); });
     }
+
+    // In single-month (landscape) fill mode the page doesn't scroll, so the wheel
+    // navigates months: down = next, up = previous. Portrait keeps normal page scroll.
+    var wheelLock = 0;
+    window.addEventListener("wheel", function (e) {
+      if (!singleMode()) return;                               // portrait → let the page scroll
+      if (document.querySelector(".overlay.open")) return;     // a modal is open → let it scroll
+      e.preventDefault();
+      if (Math.abs(e.deltaY) < 6) return;
+      var now = Date.now();
+      if (now - wheelLock < 320) return;                       // one notch = one month
+      wheelLock = now;
+      shift(e.deltaY > 0 ? 1 : -1);
+    }, { passive: false });
   }
 
   // ----- Boot -----
