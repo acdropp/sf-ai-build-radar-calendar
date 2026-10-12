@@ -1,10 +1,11 @@
 {
   "meta": {
-    "generatedAt": "2026-10-11T14:00:02Z",
+    "generatedAt": "2026-10-12T00:30:52Z",
     "lastRunLabel": "Oct 11, 2026 · 7:00am PT",
     "source": "SF AI Build Radar digest (artifact DB)",
     "eventCount": 45,
-    "newCount": 6
+    "newCount": 6,
+    "datedCount": 35
   },
   "events": [
     {
