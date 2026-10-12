@@ -426,6 +426,24 @@
 
   .empty-note { color: var(--faint); font-size: 0.85rem; padding: 20px; text-align: center; }
 
+  /* Filter bar */
+  .filterbar { margin-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .fb-search { position: relative; display: flex; align-items: center; }
+  .fb-search svg { position: absolute; left: 12px; width: 15px; height: 15px; color: var(--faint); pointer-events: none; }
+  .fb-search input { width: 100%; font: inherit; font-size: 0.9rem; color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px 9px 35px; }
+  .fb-search input::placeholder { color: var(--faint); }
+  .fb-search input:focus { outline: none; border-color: var(--accent-line); box-shadow: 0 0 0 3px var(--accent-weak); }
+  .fb-chips { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; }
+  .fchip { font: inherit; font-size: 0.78rem; font-weight: 600; color: var(--muted); background: var(--surface-2); border: 1px solid var(--line); border-radius: 20px; padding: 5px 12px; cursor: pointer; white-space: nowrap; transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease; }
+  .fchip:hover { border-color: var(--line-strong); color: var(--fg); }
+  .fchip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .fchip.on { background: var(--accent-weak); border-color: var(--accent-line); color: var(--accent); }
+  .fchip.clear { color: var(--faint); background: transparent; border-color: transparent; }
+  .fchip.clear:hover { color: var(--fg); background: var(--surface-2); }
+  .fb-sep { width: 1px; height: 18px; background: var(--line); margin: 0 3px; flex: none; }
+  .fb-count { font-family: var(--font-mono); font-size: 0.72rem; color: var(--faint); margin-left: auto; }
+  @media (max-width: 560px) { .fb-sep { display: none; } .fb-count { margin-left: 0; } }
+
   /* Stale-data banner */
   .stale { margin: 14px 0 0; padding: 10px 14px; border-radius: 10px; font-size: 0.82rem;
     background: var(--amber-weak); color: var(--amber); border: 1px solid transparent; display: flex; gap: 8px; align-items: baseline; }
@@ -463,7 +481,7 @@
 
   /* Print: a clean, expanded weekly handout */
   @media print {
-    header.app, .viewtoggle, .btn-today, .icon-btn, .l-chev, .l-actions, .stale,
+    header.app, .viewtoggle, .btn-today, .icon-btn, .l-chev, .l-actions, .stale, .filterbar,
     .nav, .cal-head .cal-title, .daypop, .overlay, footer.legend { display: none !important; }
     body, .wrap { background: #fff; color: #000; }
     .wrap { max-width: 100%; height: auto; overflow: visible; padding: 0; }
@@ -499,6 +517,28 @@
   </header>
 
   <div class="stale" id="staleBanner" role="status" hidden></div>
+
+  <div class="filterbar" id="filterBar">
+    <div class="fb-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="fSearch" type="search" placeholder="Search events, venues, themes…" autocomplete="off" aria-label="Search events">
+    </div>
+    <div class="fb-chips">
+      <button class="fchip" data-f="score" type="button">★ 4+</button>
+      <span class="fb-sep"></span>
+      <button class="fchip" data-src="luma" type="button">Luma</button>
+      <button class="fchip" data-src="meetup" type="button">Meetup</button>
+      <button class="fchip" data-src="dojo" type="button">Hacker Dojo</button>
+      <span class="fb-sep"></span>
+      <button class="fchip" data-set="inperson" type="button">In-person</button>
+      <button class="fchip" data-set="online" type="button">Online</button>
+      <span class="fb-sep"></span>
+      <button class="fchip" data-f="sf" type="button">SF only</button>
+      <button class="fchip" data-f="hide" type="button">Hide unverified/low-fit</button>
+      <button class="fchip clear" id="fClear" type="button" hidden>✕ Clear</button>
+      <span class="fb-count" id="fCount"></span>
+    </div>
+  </div>
 
   <main class="cals" id="cals" aria-live="polite"></main>
   <main class="listview" id="listView" aria-live="polite" hidden></main>
@@ -585,10 +625,22 @@
 
   // ----- State: one shared reference month drives all three calendars -----
   var ref = { y: 0, m: 0 };     // month shown in the FIRST calendar
-  var byDate = {};              // "YYYY-MM-DD" -> [events]
-  var tbc = [];                 // events with no date
-  var allEvents = [];           // flat list (for the List view)
+  var byDate = {};              // "YYYY-MM-DD" -> [events]  (filtered)
+  var tbc = [];                 // events with no date       (filtered)
+  var allEvents = [];           // flat list, filtered (for the List view)
+  var rawEvents = [];           // the full unfiltered set
   var meta = null;
+  var urlRefSet = false;        // did a deep link pin the month?
+
+  // Filter state (mirrored to the URL for shareable links)
+  var filters = {
+    minScore: 0,                // 0 or 4
+    sources: null,              // null = all; else subset of ["Luma","Meetup","Hacker Dojo","Other"]
+    setting: "all",             // "all" | "inperson" | "online"
+    dist: "all",                // "all" | "sf"  (SF-proper only)
+    hide: false,                // hide unverified / low-fit (≤2)
+    q: ""                       // keyword search
+  };
   var pickerPanelIndex = 0;     // which calendar's heading opened the picker
   var VIEW_KEY = "radar-view";
   var view = "calendar";        // "calendar" | "list"
@@ -636,15 +688,18 @@
   function normalize(data) {
     var events = Array.isArray(data) ? data : (data && data.events) || [];
     meta = (data && data.meta) || null;
-    allEvents = events.slice();
+    rawEvents = events.slice();
+    rebuild();
+  }
+  // Apply the active filters to rawEvents, repopulating the structures both views read.
+  function rebuild() {
+    var list = rawEvents.filter(matchesFilters);
+    allEvents = list.slice();
     byDate = {};
     tbc = [];
-    events.forEach(function (ev) {
-      if (ev.date) {
-        (byDate[ev.date] = byDate[ev.date] || []).push(ev);
-      } else {
-        tbc.push(ev);
-      }
+    list.forEach(function (ev) {
+      if (ev.date) { (byDate[ev.date] = byDate[ev.date] || []).push(ev); }
+      else { tbc.push(ev); }
     });
     // Within a day, sort by score desc then start time
     Object.keys(byDate).forEach(function (k) {
@@ -652,6 +707,38 @@
         return (b.score || 0) - (a.score || 0) || String(a.startTime).localeCompare(String(b.startTime));
       });
     });
+  }
+
+  // Source bucket from the free-text source field ("Luma / BuilderBase" -> "Luma").
+  function sourceCat(ev) {
+    var s = (ev.source || "").toLowerCase();
+    if (s.indexOf("hacker dojo") >= 0 || s.indexOf("hackerdojo") >= 0) return "Hacker Dojo";
+    if (s.indexOf("luma") >= 0) return "Luma";
+    if (s.indexOf("meetup") >= 0) return "Meetup";
+    return "Other";
+  }
+  function matchesFilters(ev) {
+    if (filters.minScore && (ev.score || 0) < filters.minScore) return false;
+    if (filters.sources && filters.sources.indexOf(sourceCat(ev)) < 0) return false;
+    if (filters.setting !== "all") {
+      var st = (ev.setting || "").toLowerCase();
+      var inperson = st.indexOf("in-person") >= 0 || st.indexOf("in person") >= 0 || st.indexOf("hybrid") >= 0;
+      var online = st.indexOf("online") >= 0 || st.indexOf("hybrid") >= 0 || st.indexOf("virtual") >= 0 || st.indexOf("remote") >= 0;
+      if (filters.setting === "inperson" && !inperson) return false;
+      if (filters.setting === "online" && !online) return false;
+    }
+    if (filters.dist === "sf" && regionInfo(ev).warn) return false;   // SF-proper (and online) only
+    if (filters.hide && (ev.needsVerification || (ev.score || 0) <= 2)) return false;
+    if (filters.q) {
+      var hay = [ev.name, ev.venue, ev.city, ev.address, ev.fit,
+        (ev.themes || []).join(" "), (ev.tags || []).join(" ")].join(" ").toLowerCase();
+      var terms = filters.q.toLowerCase().split(/\s+/).filter(Boolean);
+      for (var i = 0; i < terms.length; i++) if (hay.indexOf(terms[i]) < 0) return false;
+    }
+    return true;
+  }
+  function filtersActive() {
+    return !!(filters.minScore || filters.sources || filters.setting !== "all" || filters.dist === "sf" || filters.hide || filters.q);
   }
 
   function loadData() {
@@ -1053,6 +1140,70 @@
     document.getElementById("sub").textContent = sub;
   }
 
+  // ----- Filters: apply to both views, reflect in the chips, mirror to the URL -----
+  var SRC_CODE = { luma: "Luma", meetup: "Meetup", dojo: "Hacker Dojo", other: "Other" };
+  var SRC_REV = { "Luma": "luma", "Meetup": "meetup", "Hacker Dojo": "dojo", "Other": "other" };
+
+  function syncFilterUI() {
+    var bar = document.getElementById("filterBar");
+    if (!bar) return;
+    function set(sel, on) { var el = bar.querySelector(sel); if (el) el.classList.toggle("on", !!on); }
+    set('[data-f="score"]', filters.minScore === 4);
+    set('[data-src="luma"]', !!(filters.sources && filters.sources.indexOf("Luma") >= 0));
+    set('[data-src="meetup"]', !!(filters.sources && filters.sources.indexOf("Meetup") >= 0));
+    set('[data-src="dojo"]', !!(filters.sources && filters.sources.indexOf("Hacker Dojo") >= 0));
+    set('[data-set="inperson"]', filters.setting === "inperson");
+    set('[data-set="online"]', filters.setting === "online");
+    set('[data-f="sf"]', filters.dist === "sf");
+    set('[data-f="hide"]', filters.hide);
+    var inp = document.getElementById("fSearch");
+    if (inp && document.activeElement !== inp && inp.value !== filters.q) inp.value = filters.q;
+    document.getElementById("fClear").hidden = !filtersActive();
+    var shown = allEvents.length + tbc.length, total = rawEvents.length;
+    document.getElementById("fCount").textContent =
+      filtersActive() ? (shown + " of " + total + " shown") : (total + (total === 1 ? " event" : " events"));
+  }
+
+  function applyFilters() {
+    rebuild();
+    if (view === "list") renderList();
+    else { renderTBC(); render(); }
+    syncFilterUI();
+    writeURL();
+  }
+
+  function readURL() {
+    var q;
+    try { q = new URLSearchParams(location.search); } catch (e) { return; }
+    var v = q.get("v"); if (v === "list" || v === "calendar") view = v;
+    var m = q.get("m");
+    if (m && /^\d{4}-\d{1,2}$/.test(m)) {
+      var pp = m.split("-"), yy = +pp[0], mm = +pp[1] - 1;
+      if (mm >= 0 && mm <= 11) { ref = { y: yy, m: mm }; urlRefSet = true; }
+    }
+    filters.q = q.get("q") || "";
+    filters.minScore = q.get("s") === "4" ? 4 : 0;
+    var src = q.get("src");
+    filters.sources = src ? src.split(",").map(function (c) { return SRC_CODE[c]; }).filter(Boolean) : null;
+    if (filters.sources && !filters.sources.length) filters.sources = null;
+    var set = q.get("set"); filters.setting = (set === "inperson" || set === "online") ? set : "all";
+    filters.dist = q.get("dist") === "sf" ? "sf" : "all";
+    filters.hide = q.get("hide") === "1";
+  }
+
+  function writeURL() {
+    var q = new URLSearchParams();
+    q.set("v", view);
+    if (view === "calendar") q.set("m", ref.y + "-" + pad(ref.m + 1));
+    if (filters.q) q.set("q", filters.q);
+    if (filters.minScore) q.set("s", "4");
+    if (filters.sources) q.set("src", filters.sources.map(function (s) { return SRC_REV[s]; }).join(","));
+    if (filters.setting !== "all") q.set("set", filters.setting);
+    if (filters.dist === "sf") q.set("dist", "sf");
+    if (filters.hide) q.set("hide", "1");
+    try { history.replaceState(null, "", location.pathname + "?" + q.toString()); } catch (e) {}
+  }
+
   function setView(v) {
     view = (v === "list") ? "list" : "calendar";
     try { localStorage.setItem(VIEW_KEY, view); } catch (e) {}
@@ -1074,6 +1225,7 @@
       renderTBC();
       render();
     }
+    writeURL();
     window.scrollTo(0, 0);
   }
 
@@ -1083,6 +1235,7 @@
     var y = window.scrollY;
     ref = addMonths(ref.y, ref.m, delta);
     render();
+    writeURL();
     window.scrollTo(0, y); // preserve scroll position on navigation
   }
 
@@ -1091,6 +1244,7 @@
     var t = today();
     ref = { y: t.y, m: t.m };
     render();
+    writeURL();
     window.scrollTo(0, 0);
   }
 
@@ -1114,6 +1268,7 @@
     closePicker();
     closeDayPop();
     render();
+    writeURL();
     window.scrollTo(0, 0);
   }
 
@@ -1211,6 +1366,40 @@
       try { localStorage.setItem(TBC_KEY, tbcEl.open ? "1" : "0"); } catch (e) {}
     });
 
+    // Filter bar
+    document.getElementById("filterBar").addEventListener("click", function (e) {
+      var chip = e.target.closest(".fchip");
+      if (!chip) return;
+      if (chip.id === "fClear") {
+        filters = { minScore: 0, sources: null, setting: "all", dist: "all", hide: false, q: "" };
+      } else if (chip.getAttribute("data-f") === "score") {
+        filters.minScore = filters.minScore ? 0 : 4;
+      } else if (chip.getAttribute("data-f") === "sf") {
+        filters.dist = filters.dist === "sf" ? "all" : "sf";
+      } else if (chip.getAttribute("data-f") === "hide") {
+        filters.hide = !filters.hide;
+      } else if (chip.getAttribute("data-set")) {
+        var s = chip.getAttribute("data-set");
+        filters.setting = (filters.setting === s) ? "all" : s;
+      } else if (chip.getAttribute("data-src")) {
+        var name = SRC_CODE[chip.getAttribute("data-src")];
+        var cur = filters.sources ? filters.sources.slice() : [];
+        var idx = cur.indexOf(name);
+        if (idx >= 0) cur.splice(idx, 1); else cur.push(name);
+        filters.sources = cur.length ? cur : null;
+      } else { return; }
+      applyFilters();
+    });
+    var searchEl = document.getElementById("fSearch");
+    var searchT;
+    searchEl.addEventListener("input", function () {
+      clearTimeout(searchT);
+      searchT = setTimeout(function () {
+        var v = searchEl.value.trim();
+        if (v !== filters.q) { filters.q = v; applyFilters(); }
+      }, 180);
+    });
+
     document.getElementById("cals").addEventListener("click", function (e) {
       var nav = e.target.closest("[data-nav]");
       if (nav) { shift(nav.getAttribute("data-nav") === "prev" ? -1 : 1); return; }
@@ -1286,12 +1475,14 @@
 
   // ----- Boot -----
   wire();
+  readURL();                      // deep-link params set view / month / filters
   var t = today();
-  ref = { y: t.y, m: t.m };
+  if (!urlRefSet) ref = { y: t.y, m: t.m };
   loadData().then(function (data) {
-    normalize(data);
+    normalize(data);              // rebuild() applies the filters from the URL
     renderStale();
-    setView(view);   // renders the saved view (calendar default, or list)
+    syncFilterUI();
+    setView(view);                // renders the chosen view (and normalizes the URL)
   });
 })();
 </script>
