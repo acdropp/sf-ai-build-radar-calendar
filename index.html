@@ -437,8 +437,17 @@
 
   .empty-note { color: var(--faint); font-size: 0.85rem; padding: 20px; text-align: center; }
 
-  /* Filter bar */
-  .filterbar { margin-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+  /* Filter bar — one bordered, collapsible card (matches the TBC shelf) */
+  .filterbar { margin-top: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+  details.filterbar > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 9px; }
+  details.filterbar > summary::-webkit-details-marker { display: none; }
+  details.filterbar > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+  details.filterbar > summary h2 { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); margin: 0; }
+  .fb-chev { width: 15px; height: 15px; color: var(--faint); transition: transform 0.15s ease; flex: none; }
+  details.filterbar[open] > summary .fb-chev { transform: rotate(90deg); }
+  .fb-body { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+  details.filterbar:not([open]) .fb-body { display: none; }
+  .filterbar.filtered > summary h2 { color: var(--accent); }
   .fb-search { position: relative; display: flex; align-items: center; }
   .fb-search svg { position: absolute; left: 12px; width: 15px; height: 15px; color: var(--faint); pointer-events: none; }
   .fb-search input { width: 100%; font: inherit; font-size: 0.9rem; color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px 9px 35px; }
@@ -453,7 +462,7 @@
   .fchip.clear:hover { color: var(--fg); background: var(--surface-2); }
   .fb-sep { width: 1px; height: 18px; background: var(--line); margin: 0 3px; flex: none; }
   .fb-count { font-family: var(--font-mono); font-size: 0.72rem; color: var(--faint); margin-left: auto; }
-  @media (max-width: 560px) { .fb-sep { display: none; } .fb-count { margin-left: 0; } }
+  @media (max-width: 560px) { .fb-sep { display: none; } }
 
   /* Stale-data banner */
   .stale { margin: 14px 0 0; padding: 10px 14px; border-radius: 10px; font-size: 0.82rem;
@@ -529,27 +538,33 @@
 
   <div class="stale" id="staleBanner" role="status" hidden></div>
 
-  <div class="filterbar" id="filterBar">
-    <div class="fb-search">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-      <input id="fSearch" type="search" placeholder="Search events, venues, themes…" autocomplete="off" aria-label="Search events">
-    </div>
-    <div class="fb-chips">
-      <button class="fchip" data-f="score" type="button">★ 4+</button>
-      <span class="fb-sep"></span>
-      <button class="fchip" data-src="luma" type="button">Luma</button>
-      <button class="fchip" data-src="meetup" type="button">Meetup</button>
-      <button class="fchip" data-src="dojo" type="button">Hacker Dojo</button>
-      <span class="fb-sep"></span>
-      <button class="fchip" data-set="inperson" type="button">In-person</button>
-      <button class="fchip" data-set="online" type="button">Online</button>
-      <span class="fb-sep"></span>
-      <button class="fchip" data-f="sf" type="button">SF only</button>
-      <button class="fchip" data-f="hide" type="button">Hide unverified/low-fit</button>
-      <button class="fchip clear" id="fClear" type="button" hidden>✕ Clear</button>
+  <details class="filterbar" id="filterBar">
+    <summary>
+      <h2>Filter &amp; search</h2>
       <span class="fb-count" id="fCount"></span>
+      <svg class="fb-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+    </summary>
+    <div class="fb-body">
+      <div class="fb-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input id="fSearch" type="search" placeholder="Search events, venues, themes…" autocomplete="off" aria-label="Search events">
+      </div>
+      <div class="fb-chips">
+        <button class="fchip" data-f="score" type="button">★ 4+</button>
+        <span class="fb-sep"></span>
+        <button class="fchip" data-src="luma" type="button">Luma</button>
+        <button class="fchip" data-src="meetup" type="button">Meetup</button>
+        <button class="fchip" data-src="dojo" type="button">Hacker Dojo</button>
+        <span class="fb-sep"></span>
+        <button class="fchip" data-set="inperson" type="button">In-person</button>
+        <button class="fchip" data-set="online" type="button">Online</button>
+        <span class="fb-sep"></span>
+        <button class="fchip" data-f="sf" type="button">SF only</button>
+        <button class="fchip" data-f="hide" type="button">Hide unverified/low-fit</button>
+        <button class="fchip clear" id="fClear" type="button" hidden>✕ Clear</button>
+      </div>
     </div>
-  </div>
+  </details>
 
   <main class="cals" id="cals" aria-live="polite"></main>
   <main class="listview" id="listView" aria-live="polite" hidden></main>
@@ -1210,6 +1225,7 @@
     var inp = document.getElementById("fSearch");
     if (inp && document.activeElement !== inp && inp.value !== filters.q) inp.value = filters.q;
     document.getElementById("fClear").hidden = !filtersActive();
+    bar.classList.toggle("filtered", filtersActive());
     var shown = allEvents.length + tbc.length, total = rawEvents.length;
     document.getElementById("fCount").textContent =
       filtersActive() ? (shown + " of " + total + " shown") : (total + (total === 1 ? " event" : " events"));
@@ -1412,7 +1428,7 @@
     // TBC shelf remembers whether it's collapsed (default: expanded)
     var TBC_KEY = "radar-tbc-open";
     var tbcEl = document.getElementById("tbcShelf");
-    try { tbcEl.open = localStorage.getItem(TBC_KEY) !== "0"; } catch (e) { tbcEl.open = true; }
+    try { tbcEl.open = localStorage.getItem(TBC_KEY) === "1"; } catch (e) { tbcEl.open = false; }
     tbcEl.addEventListener("toggle", function () {
       try { localStorage.setItem(TBC_KEY, tbcEl.open ? "1" : "0"); } catch (e) {}
     });
@@ -1534,6 +1550,8 @@
     normalize(data);              // rebuild() applies the filters from the URL
     renderStale();
     syncFilterUI();
+    // Collapsed by default; opens on load only when a deep link arrives with filters set.
+    document.getElementById("filterBar").open = filtersActive();
     setView(view);                // renders the chosen view (and normalizes the URL)
   });
 })();
