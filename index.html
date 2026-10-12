@@ -322,11 +322,14 @@
 
   /* Anchored day popover */
   .daypop {
-    position: fixed; z-index: 60; width: 300px; max-width: calc(100vw - 24px); max-height: 70vh;
+    position: fixed; z-index: 60; width: 380px; max-width: calc(100vw - 24px); max-height: 78vh;
     background: var(--surface); border: 1px solid var(--line-strong); border-radius: 12px;
     box-shadow: 0 16px 48px rgba(0, 0, 0, 0.55); display: flex; flex-direction: column; overflow: hidden;
   }
   .daypop[hidden] { display: none; }
+  /* Reused list rows inside the popover: lift off the popover surface + a selection cue */
+  #dpList details.lrow { background: var(--surface-2); }
+  #dpList details.lrow.dp-sel { border-color: var(--accent-line); }
   .dp-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 11px 12px 9px; border-bottom: 1px solid var(--line); flex: none; }
   .dp-title { margin: 0; font-size: 0.82rem; font-weight: 700; }
   .dp-close { background: none; border: none; color: var(--faint); font-size: 1.15rem; line-height: 1; cursor: pointer; padding: 0 2px; }
@@ -1342,53 +1345,61 @@
   // ----- Day popover: anchored to the clicked cell, fit-to-content with capped scroll -----
   var dpSel = -1; // keyboard-selected row index
 
+  var dpRect = null;   // anchor cell rect, kept so the popover can re-place when a row expands
   function openDayPop(key, rect) {
     var evs = byDate[key] || [];
     if (!evs.length) return;
+    dpRect = rect;
     var parts = key.split("-");
     var y = +parts[0], m = +parts[1] - 1, d = +parts[2];
+    var t = today(), tk = dateKey(t.y, t.m, t.d), isPast = key < tk;
     document.getElementById("dpTitle").textContent =
       DOW[new Date(y, m, d).getDay()] + ", " + MONTHS_SHORT[m] + " " + d + " · " +
       evs.length + (evs.length === 1 ? " event" : " events");
     var list = document.getElementById("dpList");
-    list.innerHTML = evs.map(function (ev, i) {
-      var meter = "";
-      for (var k = 1; k <= 5; k++) meter += '<i class="' + (k <= (ev.score || 0) ? "on" : "") + '"></i>';
-      var pills = "";
-      if (ev.status === "new") pills += '<span class="pill new">new</span> ';
-      if (ev.distanceNote) pills += '<span class="pill dist">' + esc(ev.distanceNote.split("—")[0].trim()) + "</span> ";
-      if (ev.needsVerification) pills += '<span class="pill verify">verify</span> ';
-      var time = ev.startTime ? (ev.startTime + (ev.endTime ? "–" + ev.endTime : "") + " " + (ev.tz || "PT")) : "";
-      var loc = [ev.venue, ev.city].filter(Boolean).join(", ");
-      return '<a class="dp-row" data-i="' + i + '" href="' + esc(ev.url) + '" target="_blank" rel="noopener">' +
-        '<div class="r-top"><span class="r-name">' + esc(ev.name) + "</span>" +
-        '<span class="meter">' + meter + "</span></div>" +
-        '<div class="r-meta"><span>' + esc(time) + "</span><span>" + esc(loc) + "</span>" +
-        (ev.price ? "<span>" + esc(ev.price) + "</span>" : "") + "</div>" +
-        (pills ? '<div class="r-meta">' + pills + "</div>" : "") + "</a>";
-    }).join("");
+    // Reuse the list view's expandable row: click a row to reveal full detail.
+    list.innerHTML = evs.map(function (ev) { return lrow(ev, isPast); }).join("");
+    // Re-place the popover whenever a row expands/collapses so it stays in view.
+    [].forEach.call(list.querySelectorAll("details.lrow"), function (dd) {
+      dd.addEventListener("toggle", clampPop);
+    });
     dpSel = -1;
     list.scrollTop = 0;
-
-    // Measure, then place — fit to content (max-height caps it), flipping near edges.
+    placePop();
+  }
+  function placePop() {
     var pop = document.getElementById("dayPop");
+    if (!dpRect) return;
     pop.hidden = false;
     pop.style.visibility = "hidden";
     pop.style.left = "0px";
     pop.style.top = "0px";
     var pr = pop.getBoundingClientRect();
     var vw = window.innerWidth, vh = window.innerHeight, M = 12, G = 6, w = pr.width, h = pr.height;
-    var left = rect.left;
-    if (left + w > vw - M) left = rect.right - w;           // flip leftward near the right edge
+    var left = dpRect.left;
+    if (left + w > vw - M) left = dpRect.right - w;          // flip leftward near the right edge
     left = Math.max(M, Math.min(left, vw - w - M));
-    var top = rect.bottom + G;
+    var top = dpRect.bottom + G;
     if (top + h > vh - M) {                                  // flip above near the bottom edge
-      var above = rect.top - G - h;
+      var above = dpRect.top - G - h;
       top = (above >= M) ? above : Math.max(M, vh - h - M);
     }
     pop.style.left = left + "px";
     pop.style.top = top + "px";
     pop.style.visibility = "visible";
+  }
+  // Lightweight re-clamp after a row expands: keep the (now taller) popover on-screen.
+  function clampPop() {
+    var pop = document.getElementById("dayPop");
+    if (pop.hidden) return;
+    var r = pop.getBoundingClientRect();
+    var vh = window.innerHeight, M = 12;
+    var top = parseFloat(pop.style.top);
+    if (isNaN(top)) top = r.top;
+    if (r.height >= vh - 2 * M) top = M;                     // taller than viewport → pin top, inner scroll
+    else if (top + r.height > vh - M) top = vh - M - r.height;
+    if (top < M) top = M;
+    pop.style.top = top + "px";
   }
   function closeDayPop() {
     var p = document.getElementById("dayPop");
@@ -1396,15 +1407,15 @@
   }
   function dpOpen() { return !document.getElementById("dayPop").hidden; }
   function dpMove(delta) {
-    var rows = document.querySelectorAll("#dpList .dp-row");
+    var rows = document.querySelectorAll("#dpList details.lrow");
     if (!rows.length) return;
     dpSel = (dpSel + delta + rows.length) % rows.length;
-    rows.forEach(function (r, i) { r.classList.toggle("sel", i === dpSel); });
+    rows.forEach(function (r, i) { r.classList.toggle("dp-sel", i === dpSel); });
     rows[dpSel].scrollIntoView({ block: "nearest" });
   }
   function dpEnter() {
-    var rows = document.querySelectorAll("#dpList .dp-row");
-    if (dpSel >= 0 && rows[dpSel]) window.open(rows[dpSel].href, "_blank", "noopener");
+    var rows = document.querySelectorAll("#dpList details.lrow");
+    if (dpSel >= 0 && rows[dpSel]) { rows[dpSel].open = !rows[dpSel].open; clampPop(); }
   }
 
   // ----- Events wiring (delegated) -----
@@ -1472,10 +1483,13 @@
       if (nav) { shift(nav.getAttribute("data-nav") === "prev" ? -1 : 1); return; }
       var pick = e.target.closest("[data-pick]");
       if (pick) { openPicker(parseInt(pick.getAttribute("data-pick"), 10)); return; }
-      // clicking a day cell (not a chip link) opens its popover, anchored to the cell
-      if (!e.target.closest("a.ev")) {
-        var cell = e.target.closest(".cell.has");
-        if (cell) { openDayPop(cell.getAttribute("data-day"), cell.getBoundingClientRect()); }
+      // clicking anywhere in a day cell — chip or empty space — opens its popover
+      // (a chip no longer navigates directly; the popover shows the day's events,
+      // each expandable to full detail)
+      var cell = e.target.closest(".cell.has");
+      if (cell) {
+        if (e.target.closest("a.ev")) e.preventDefault();   // don't follow the chip's link
+        openDayPop(cell.getAttribute("data-day"), cell.getBoundingClientRect());
       }
     });
 
@@ -1491,8 +1505,12 @@
     document.addEventListener("click", function (e) {
       if (dpOpen() && !e.target.closest("#dayPop") && !e.target.closest(".cell.has")) closeDayPop();
     });
-    // the popover is anchored to a cell, so on scroll/resize just close it rather than chase the cell
-    window.addEventListener("scroll", closeDayPop, true);
+    // the popover is anchored to a cell, so on page scroll just close it rather than chase
+    // the cell — but ignore scrolling that happens inside the popover's own list
+    window.addEventListener("scroll", function (e) {
+      if (e.target && e.target.closest && e.target.closest("#dayPop")) return;
+      closeDayPop();
+    }, true);
 
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape") { closePicker(); closeDayPop(); return; }

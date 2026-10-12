@@ -111,8 +111,8 @@ themes light/dark (dark default; light uses the digest's color scheme).
 - **Synchronized nav:** arrows and the month/year picker move the reference month; in the stacked view every visible month shifts together. The picker lands the chosen month in the calendar whose heading was clicked; works across year boundaries.
 - **Context-aware wheel:** scrolls the page in the stacked view; navigates months in the single-month landscape fill view.
 - **Today** resets to the current month. A clickable month/year heading opens the picker.
-- **Event chips** show name-first (with a "new" dot), link out to `url`, and carry score tier + verify styling. **Score + past dimming:** score ≤2 / `needsVerification` / past days are dimmed but never hidden.
-- **Crowded days** cap chips per cell and show a "+N ▲" triangle that opens an **anchored day popover** (fit-to-content, capped scroll, keyboard nav, edge-flipping).
+- **Event chips** show name-first (with a "new" dot) and carry score tier + verify styling. **Score + past dimming:** score ≤2 / `needsVerification` / past days are dimmed but never hidden.
+- **Clicking any day — a chip or empty space, one event or many — opens the anchored day popover** (fit-to-content, capped scroll, keyboard nav, edge-flipping) listing that day's events. Each popover row is the same expandable row as the list view: click it to reveal the full detail (When/Where/Setting/Admission/Format/Source, themes, why-it-fits, Open event / Add to calendar / Google Calendar). Crowded cells cap chips and show a "+N ▲" triangle.
 - **TBC shelf** ("No date yet · to be confirmed") sits below the calendar, is **collapsible** (default collapsed), and is **dropped automatically in short landscape** so it never squeezes the grid below a legible height.
 
 ### List view
@@ -199,8 +199,8 @@ partial scrape can't wipe the calendar. Commit messages double as a changelog, e
 - [x] Score ≤2 / `needsVerification` events appear but are dimmed, not hidden.
 - [x] `new` and distance/region events carry badges.
 - [x] Undated events appear in the (collapsible) TBC shelf, never dropped.
+- [x] Clicking any day (chip or empty space) opens the day popover; each row expands to full detail and links out from there.
 - [x] Crowded days cap chips and offer a "+N" day popover.
-- [x] Every event links out to its source `url`.
 
 **Robustness**
 
