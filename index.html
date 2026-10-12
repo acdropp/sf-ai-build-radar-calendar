@@ -114,7 +114,7 @@
   /* TBC shelf */
   .tbc {
     background: var(--surface); border: 1px solid var(--line);
-    border-radius: 12px; padding: 12px 14px; margin-bottom: 20px;
+    border-radius: 12px; padding: 12px 14px; margin-top: 20px;
   }
   .tbc h2 {
     font-size: 0.7rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase;
@@ -149,7 +149,7 @@
     }
     header.app { position: static; margin: 0 -20px 14px; padding: 12px 20px; }
     footer.legend { flex: 0 0 auto; margin-top: 14px; padding-top: 12px; }
-    .tbc { margin-bottom: 14px; flex: 0 0 auto; }
+    .tbc { margin-top: 14px; flex: 0 0 auto; }
     /* List view scrolls normally even in landscape — the single-month fill only applies to the calendar */
     body.view-list .wrap { height: auto; overflow: visible; padding-bottom: 48px; }
     body.view-list header.app { position: sticky; top: 0; }
@@ -397,13 +397,13 @@
     </div>
   </header>
 
+  <main class="cals" id="cals" aria-live="polite"></main>
+  <main class="listview" id="listView" aria-live="polite" hidden></main>
+
   <section class="tbc" id="tbcShelf" hidden>
     <h2>No date yet · to be confirmed</h2>
     <div class="tbc-items" id="tbcItems"></div>
   </section>
-
-  <main class="cals" id="cals" aria-live="polite"></main>
-  <main class="listview" id="listView" aria-live="polite" hidden></main>
 
   <footer class="legend">
     <span class="k"><span class="sw high"></span> strong fit (4–5)</span>
