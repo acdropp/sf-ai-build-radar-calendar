@@ -1,11 +1,11 @@
 {
   "meta": {
-    "generatedAt": "2026-10-12T00:30:52Z",
-    "lastRunLabel": "Oct 11, 2026 · 7:00am PT",
+    "generatedAt": "2026-10-12T14:22:53Z",
+    "lastRunLabel": "Oct 12, 2026 · 7:00am PT",
     "source": "SF AI Build Radar digest (artifact DB)",
-    "eventCount": 45,
+    "eventCount": 51,
     "newCount": 6,
-    "datedCount": 35
+    "datedCount": 40
   },
   "events": [
     {
@@ -37,37 +37,6 @@
       "url": "https://luma.com/builde-pozq",
       "venue": "Frontier Tower",
       "id": "multi-model-hackathon-builderbase"
-    },
-    {
-      "address": "",
-      "city": "Oakland",
-      "date": "2026-10-11",
-      "dateDisplay": "Oct 11 (series)",
-      "distanceNote": "East Bay — Oakland (across the water)",
-      "endTime": null,
-      "fit": "Pure hands-on coding-agent practice with a builder community. Docked only for the East Bay trek.",
-      "membership": "None required",
-      "name": "Oakland Claude Code Hands-on Workshop",
-      "needsVerification": true,
-      "price": "Free (per group norms)",
-      "score": 4,
-      "setting": "in-person",
-      "source": "Meetup",
-      "startTime": null,
-      "status": "seen",
-      "tags": [
-        "🛠️ build",
-        "🗣️ discussion"
-      ],
-      "themes": [
-        "Hands-on Claude Code evening — common use cases, debug real examples",
-        "Share notes on agent workflows; collaborative, low-pressure; bring laptop",
-        "Series repeats through Oct (11/14/16/18/19/20/21/28)"
-      ],
-      "tz": "PT",
-      "url": "https://www.meetup.com/claude-code-enthusiasts-evening-social-club/",
-      "venue": "Oakland",
-      "id": "oakland-claude-code-workshop"
     },
     {
       "address": "",
@@ -163,6 +132,68 @@
       "id": "sf-agents-owning-inference"
     },
     {
+      "address": "",
+      "city": "San Francisco",
+      "date": "2026-10-12",
+      "dateDisplay": "Oct 12",
+      "endTime": "9:00 PM",
+      "fit": "Hands-on one-evening build plus demos and a relaxed social vibe — fun community build, though cloud-API (not own-your-AI) and currently waitlisted.",
+      "membership": "None required (approval; currently waitlist)",
+      "name": "Claude for Games · Build Day",
+      "needsVerification": false,
+      "price": "Free (Claude API + Apify credits provided)",
+      "score": 3,
+      "setting": "in-person",
+      "source": "Luma",
+      "startTime": "5:00 PM",
+      "status": "new",
+      "tags": [
+        "🛠️ build",
+        "🎤 demo",
+        "🍻 social"
+      ],
+      "themes": [
+        "Build a small playable video game with Claude in one evening",
+        "Demos after; 'no competition, no judging, no homework'",
+        "Claude API + Apify credits for attendees"
+      ],
+      "tz": "PT",
+      "url": "https://luma.com/claudeforgames",
+      "venue": "San Francisco (venue shared after approval)",
+      "id": "claude-for-games-build-day"
+    },
+    {
+      "address": "",
+      "city": "San Francisco",
+      "date": "2026-10-12",
+      "dateDisplay": "Oct 12–13",
+      "endTime": null,
+      "fit": "Own-your-AI-aligned summit (open, portable, controllable models) with a hands-on Day 0 workshop; conference-leaning — the sibling Oct 12 OIS workshop day is the more hands-on half.",
+      "membership": "None stated",
+      "name": "Open Intelligence Summit (DigitalOcean)",
+      "needsVerification": true,
+      "price": "Not shown (approval required)",
+      "score": 3,
+      "setting": "in-person",
+      "source": "Luma / DigitalOcean",
+      "startTime": null,
+      "status": "new",
+      "tags": [
+        "👩🏽‍🏫 lecture",
+        "🎤 demo",
+        "🛠️ build"
+      ],
+      "themes": [
+        "Keeping AI 'open, portable, and in the hands of builders'",
+        "Day 0 hands-on workshop (with MLH) + Day 1 deep dives, demos, discussions",
+        "Hosted by DigitalOcean Community"
+      ],
+      "tz": "PT",
+      "url": "https://luma.com/digita-ghqh",
+      "venue": "San Francisco (venue shared after approval)",
+      "id": "open-intelligence-summit-digitalocean"
+    },
+    {
       "address": "525 Market St",
       "city": "San Francisco",
       "date": "2026-10-13",
@@ -238,7 +269,7 @@
       "setting": "in-person",
       "source": "Luma / Devnovate",
       "startTime": "9:00 AM",
-      "status": "new",
+      "status": "seen",
       "tags": [
         "🦾 hackathon",
         "🛠️ build"
@@ -252,6 +283,37 @@
       "url": "https://luma.com/5z8w42mq",
       "venue": "San Francisco (register to see address)",
       "id": "embedded-sf-physical-ai-hackathon"
+    },
+    {
+      "address": "",
+      "city": "Oakland",
+      "date": "2026-10-13",
+      "dateDisplay": "Oct 13+ (series)",
+      "distanceNote": "East Bay — Oakland (across the water)",
+      "endTime": null,
+      "fit": "Pure hands-on coding-agent practice with a builder community. Docked only for the East Bay trek.",
+      "membership": "None required",
+      "name": "Oakland Claude Code Hands-on Workshop",
+      "needsVerification": false,
+      "price": "Free (per group norms)",
+      "score": 4,
+      "setting": "in-person",
+      "source": "Meetup",
+      "startTime": null,
+      "status": "seen",
+      "tags": [
+        "🛠️ build",
+        "🗣️ discussion"
+      ],
+      "themes": [
+        "Hands-on Claude Code evenings — common use cases, debug real examples",
+        "Share agent-workflow notes; collaborative, low-pressure; bring a laptop",
+        "Near-daily series; next instances Oct 13/14/16/18/19/20/21/28"
+      ],
+      "tz": "PT",
+      "url": "https://www.meetup.com/claude-code-enthusiasts-evening-social-club/",
+      "venue": "Oakland",
+      "id": "oakland-claude-code-workshop"
     },
     {
       "address": "",
@@ -349,6 +411,36 @@
       "city": "San Francisco",
       "date": "2026-10-14",
       "dateDisplay": "Oct 14",
+      "endTime": "6:00 PM",
+      "fit": "Genuine one-day in-person SF hackathon with mentors and demos; generic build-anything framing rather than own-your-AI.",
+      "membership": "None required",
+      "name": "Fast Forward — AI Hackathon",
+      "needsVerification": false,
+      "price": "Not shown (approval required)",
+      "score": 3,
+      "setting": "in-person",
+      "source": "Luma (Vercel Events)",
+      "startTime": "10:00 AM",
+      "status": "new",
+      "tags": [
+        "🦾 hackathon",
+        "🛠️ build",
+        "🎤 demo"
+      ],
+      "themes": [
+        "One-day hackathon building AI agents, multimodal apps, and VR experiences",
+        "Mentors on site; live finalist demos"
+      ],
+      "tz": "PT",
+      "url": "https://luma.com/fastforwardhack",
+      "venue": "San Francisco (venue shared after approval)",
+      "id": "fast-forward-hackathon"
+    },
+    {
+      "address": "",
+      "city": "San Francisco",
+      "date": "2026-10-14",
+      "dateDisplay": "Oct 14",
       "endTime": null,
       "fit": "Open-source builders' community, in-person SF, free, explicitly anti-pitch — docked because it's OSS generally, not an AI build session.",
       "membership": "None required",
@@ -389,7 +481,7 @@
       "setting": "in-person",
       "source": "Luma / Devnovate",
       "startTime": "9:30 AM",
-      "status": "new",
+      "status": "seen",
       "tags": [
         "🦾 hackathon",
         "🛠️ build"
@@ -419,7 +511,7 @@
       "setting": "in-person",
       "source": "Luma / AWS Builder Loft",
       "startTime": "9:20 AM",
-      "status": "new",
+      "status": "seen",
       "tags": [
         "🎤 demo",
         "👩🏽‍🏫 lecture",
@@ -615,6 +707,37 @@
       "id": "ai-startup-challenge-hackathon"
     },
     {
+      "address": "3200 Patrick Henry Dr, Santa Clara, CA",
+      "city": "Santa Clara",
+      "date": "2026-10-20",
+      "dateDisplay": "Oct 20",
+      "distanceNote": "South Bay — Hacker Dojo (Santa Clara, new location)",
+      "endTime": "8:00 PM",
+      "fit": "Hands-on build evening at Hacker Dojo (your gold-standard venue); general AI-assisted projects rather than own-your-AI, now at the Santa Clara location.",
+      "membership": "None required",
+      "name": "Software Projects with AI (Hacker Dojo)",
+      "needsVerification": true,
+      "price": "Free",
+      "score": 3,
+      "setting": "in-person",
+      "source": "Meetup / Hacker Dojo",
+      "startTime": "6:30 PM",
+      "status": "new",
+      "tags": [
+        "🛠️ build",
+        "🗣️ discussion"
+      ],
+      "themes": [
+        "Hands-on evening building software projects with AI",
+        "Recurring Hacker Dojo series",
+        "Bring a laptop / project"
+      ],
+      "tz": "PT",
+      "url": "https://www.meetup.com/hackerdojo/events/",
+      "venue": "Hacker Dojo",
+      "id": "hackerdojo-software-projects-ai"
+    },
+    {
       "address": "",
       "city": "Menlo Park",
       "date": "2026-10-23",
@@ -624,12 +747,12 @@
       "fit": "Hands-on build day with two strong builder platforms. Distance + time to verify.",
       "membership": "None required",
       "name": "Intelligence at Work Hackathon",
-      "needsVerification": true,
+      "needsVerification": false,
       "price": "Not shown",
       "score": 4,
       "setting": "in-person",
       "source": "Cerebral Valley",
-      "startTime": null,
+      "startTime": "8:30 AM",
       "status": "seen",
       "tags": [
         "🦾 hackathon"
@@ -675,6 +798,38 @@
       "id": "multi-model-hackathon-betafund"
     },
     {
+      "address": "135 Constitution Dr, Menlo Park, CA 94025",
+      "city": "Menlo Park",
+      "date": "2026-10-27",
+      "dateDisplay": "Oct 27",
+      "distanceNote": "South Bay — Menlo Park (~45 min from SF)",
+      "endTime": null,
+      "fit": "Hands-on OSS vision / physical-AI workshop — genuinely hands-on and open-source, but South Bay and essentially the Oct 28 SF session's twin.",
+      "membership": "None required",
+      "name": "Silicon Valley Physical AI Workshop & Meetup",
+      "needsVerification": true,
+      "price": "Not shown",
+      "score": 3,
+      "setting": "in-person",
+      "source": "Voxel51",
+      "startTime": null,
+      "status": "new",
+      "tags": [
+        "👩🏽‍🏫 workshop",
+        "🛠️ build",
+        "🍻 social"
+      ],
+      "themes": [
+        "Hands-on open-source vision / physical-AI workshop (Voxel51 + Nebius)",
+        "Live model fine-tune; FiftyOne + open models",
+        "Sibling of the SF Oct 28 edition"
+      ],
+      "tz": "PT",
+      "url": "https://voxel51.com/events/silicon-valley-physical-ai-workshop-and-meetup-october-27-2026",
+      "venue": "Silicon Valley AI Hub",
+      "id": "silicon-valley-physical-ai-workshop"
+    },
+    {
       "address": "",
       "city": "Burlingame",
       "date": "2026-10-28",
@@ -706,7 +861,7 @@
       "id": "odsc-nebius-hackathon"
     },
     {
-      "address": "144 Townsend St, 3rd fl",
+      "address": "144 Townsend St, 3rd Floor",
       "city": "San Francisco",
       "date": "2026-10-28",
       "dateDisplay": "Oct 28",
@@ -714,7 +869,7 @@
       "fit": "Genuinely hands-on (train a detector live), hardware-adjacent. Collides with the ODSC×Nebius hackathon same day.",
       "membership": "None required",
       "name": "SF Physical AI Workshop and Meetup",
-      "needsVerification": true,
+      "needsVerification": false,
       "price": "Not shown",
       "score": 4,
       "setting": "in-person",
@@ -932,7 +1087,7 @@
       "setting": "in-person",
       "source": "Luma / Devnovate",
       "startTime": "9:30 AM",
-      "status": "new",
+      "status": "seen",
       "tags": [
         "🎤 demo"
       ],
@@ -1123,6 +1278,36 @@
       "id": "vibe-night-demos-29"
     },
     {
+      "address": "995 Market St, San Francisco",
+      "city": "San Francisco",
+      "date": null,
+      "dateDisplay": "Date TBC",
+      "endTime": null,
+      "fit": "Direct open-source / own-your-AI angle (Cline open-source coding agent) at Frontier Tower — but members-only and no date posted yet.",
+      "membership": "Members / founding citizenship",
+      "name": "Cline Open Source AI Hackathon (Frontier Tower)",
+      "needsVerification": true,
+      "price": "Not shown (Members Only)",
+      "score": 4,
+      "setting": "in-person",
+      "source": "Luma / Frontier Tower",
+      "startTime": null,
+      "status": "new",
+      "tags": [
+        "🦾 hackathon",
+        "🛠️ build"
+      ],
+      "themes": [
+        "Open-source AI hackathon built around Cline (open-source coding agent)",
+        "Frontier Tower members-only",
+        "Details TBA"
+      ],
+      "tz": "PT",
+      "url": "https://luma.com/venue-placeholder-cline-open-source-ai-h",
+      "venue": "Frontier Tower @ Spaceship",
+      "id": "cline-open-source-ai-hackathon"
+    },
+    {
       "address": "135 Constitution Dr, Menlo Park, CA 94025",
       "city": "Menlo Park",
       "date": null,
@@ -1261,7 +1446,7 @@
       "setting": "in-person",
       "source": "Luma / Frontier Tower",
       "startTime": null,
-      "status": "new",
+      "status": "seen",
       "tags": [
         "🦾 hackathon"
       ],
@@ -1291,7 +1476,7 @@
       "setting": "in-person",
       "source": "Luma",
       "startTime": "9:30 AM",
-      "status": "new",
+      "status": "seen",
       "tags": [
         "🦾 hackathon",
         "🛠️ build"
