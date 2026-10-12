@@ -96,13 +96,13 @@ One self-contained page, two views behind a toggle, both fed by `events.json`. T
 
 **The toggle.** A persistent List ⇄ Calendar switch in the header. Same data, same filters apply to both. Default to Calendar (Aaron is visual), remember the last choice in `localStorage` as a per-viewer convenience only.
 
-**Calendar view — the 3-month synchronized dashboard.** Reuse the prototype Aaron already designed. Core requirements carried from that spec:
+**Calendar view — the adaptive month dashboard.** Reuse the prototype Aaron already designed. Core requirements carried from that spec:
 
-- Three consecutive months shown, defaulting to current month + next two.
-- **Synchronized navigation:** the back/forward arrows on *any* month shift all three by one month together — never one calendar independently.
+- **Layout adapts to the tile shape:** a landscape/wide tile shows one month grown to fill the tile; a portrait/tall tile stacks months with at least two visible at once. Reference month defaults to the current month.
+- **Synchronized navigation:** the back/forward arrows and the month/year picker move the reference month; in the stacked view every visible month shifts together, never independently.
 - A clickable month/year heading opens a month+year picker; the chosen month lands in the calendar whose heading was clicked, and the others re-sequence around it. Works across year boundaries.
-- **Responsive:** stack vertically in portrait/tall windows; flow side-by-side (3-up, or 2-up with the third wrapping) in wide windows; recompute on resize without changing the selected months.
-- **Mouse wheel scrolls the page, never changes months.** No nested scroll region hijacks the wheel.
+- **Responsive:** portrait/tall tiles stack the months vertically with at least two visible; a landscape/wide tile shows a single month filling the tile. Recompute on resize or orientation change without losing the reference month.
+- **Mouse wheel is context-aware:** in the stacked (portrait) view it scrolls the page; in the single-month (landscape) fill view, where the page doesn't scroll, it navigates months (wheel down = next month, up = previous). No nested scroll region hijacks the wheel.
 - A **Today** button resets to the current month and scrolls to top.
 - Dark charcoal theme, lighter rounded panels, one accent color, today's date distinguished.
 
@@ -191,12 +191,12 @@ Call it done when all of these hold:
 
 **Calendar behavior** (from the prototype spec)
 
-- [ ] Three consecutive months show on load — current + next two.
-- [ ] Clicking either arrow on any month shifts all three by exactly one month.
+- [ ] Portrait stacks months with at least two visible at once; landscape shows one month grown to fill the tile.
+- [ ] In the stacked view, clicking either arrow on any month shifts every visible month by exactly one month together.
 - [ ] Clicking any month heading opens the month/year picker; the chosen month lands in that calendar and the others re-sequence.
 - [ ] Navigation across a December→January boundary works correctly.
-- [ ] Tall windows stack the months; wide windows lay them out horizontally; resizing re-lays-out without changing the selected months.
-- [ ] Mouse-wheel scrolling moves the page and never changes the displayed months.
+- [ ] Rotating or resizing between portrait and landscape re-lays-out (stacked ↔ single-month fill) without losing the reference month.
+- [ ] Mouse wheel scrolls the page in the stacked view, and navigates months (up/down) in the single-month landscape view.
 - [ ] Today returns to the current month and scrolls to top.
 
 **Views & density**
