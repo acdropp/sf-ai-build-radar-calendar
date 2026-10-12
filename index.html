@@ -361,12 +361,22 @@
   .listview { display: flex; flex-direction: column; gap: 26px; }
   .listview[hidden] { display: none; }
   .lsec { }
-  .lsec-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .lsec-head { display: flex; align-items: center; gap: 10px; margin-bottom: 0; }
   .lsec-head h2 { font-size: 0.74rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--fg); margin: 0; }
   .lsec-head .count { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); background: var(--surface-2); border-radius: 20px; padding: 1px 9px; }
   .lsec-head .rule { flex: 1; height: 1px; background: var(--line); }
-  .lsec-hint { font-size: 0.82rem; color: var(--faint); margin: -2px 0 12px; }
+  .lsec-chev { width: 15px; height: 15px; color: var(--faint); flex: none; transition: transform 0.15s ease; }
+  .lsec-hint { font-size: 0.82rem; color: var(--faint); margin: 0; }
   .lrows { display: flex; flex-direction: column; gap: 8px; }
+
+  /* Collapsible list sections */
+  details.lsec > summary { list-style: none; cursor: pointer; padding: 3px 0; }
+  details.lsec > summary::-webkit-details-marker { display: none; }
+  details.lsec > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  details.lsec[open] > summary .lsec-chev { transform: rotate(90deg); }
+  details.lsec > .lsec-hint { margin-top: 10px; }
+  details.lsec > .lrows, details.lsec > .lpanel, details.lsec > .trackgrid { margin-top: 12px; }
+  details.lsec:not([open]) > *:not(summary) { display: none !important; }  /* beat author display:flex/grid on closed sections */
 
   /* Collapsible event row */
   details.lrow {
@@ -1095,20 +1105,36 @@
       "</div>" +
     "</details>";
   }
-  function lsection(title, hint, rows, cls) {
+  // Per-section collapse state (remembered per viewer). Defaults per Aaron's spec.
+  var SEC_PREFIX = "radar-sec-";
+  var secDefaults = { whatsnew: false, thisweek: true, upcoming: true, tbc: false, past: false, gaps: false, tracked: false };
+  var secState = {};
+  Object.keys(secDefaults).forEach(function (k) {
+    var v = null;
+    try { v = localStorage.getItem(SEC_PREFIX + k); } catch (e) {}
+    secState[k] = (v === null) ? secDefaults[k] : (v === "1");
+  });
+  var SEC_CHEV = '<svg class="lsec-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
+  function secHead(title, count) {
+    return '<summary><div class="lsec-head"><h2>' + esc(title) + "</h2>" +
+      '<span class="count">' + count + '</span><span class="rule"></span>' + SEC_CHEV + "</div></summary>";
+  }
+
+  function lsection(title, hint, rows, cls, key) {
     if (!rows.length) return "";
-    return '<section class="lsec' + (cls ? " " + cls : "") + '"><div class="lsec-head"><h2>' + esc(title) + "</h2>" +
-      '<span class="count">' + rows.length + '</span><span class="rule"></span></div>' +
+    var open = key ? secState[key] : true;
+    return '<details class="lsec' + (cls ? " " + cls : "") + '" data-sec="' + esc(key || "") + '"' + (open ? " open" : "") + ">" +
+      secHead(title, rows.length) +
       (hint ? '<p class="lsec-hint">' + esc(hint) + "</p>" : "") +
-      '<div class="lrows">' + rows.join("") + "</div></section>";
+      '<div class="lrows">' + rows.join("") + "</div></details>";
   }
   // Coverage-gaps + tracked-series panels, straight from the digest's meta/run.
   function gapsPanel() {
     if (!meta || !meta.gaps || !meta.gaps.length) return "";
-    return '<section class="lsec"><div class="lsec-head"><h2>Coverage gaps this run</h2>' +
-      '<span class="count">' + meta.gaps.length + '</span><span class="rule"></span></div>' +
+    return '<details class="lsec" data-sec="gaps"' + (secState.gaps ? " open" : "") + ">" +
+      secHead("Coverage gaps this run", meta.gaps.length) +
       '<p class="lsec-hint">What the radar knows is thin or unconfirmed — so you also see what it is <em>not</em> showing.</p>' +
-      '<div class="lpanel gaps"><ul>' + meta.gaps.map(function (g) { return "<li>" + esc(g) + "</li>"; }).join("") + "</ul></div></section>";
+      '<div class="lpanel gaps"><ul>' + meta.gaps.map(function (g) { return "<li>" + esc(g) + "</li>"; }).join("") + "</ul></div></details>";
   }
   function trackedPanel() {
     if (!meta || !meta.tracked || !meta.tracked.length) return "";
@@ -1118,10 +1144,10 @@
         (tr.url ? '<a href="' + esc(tr.url) + '" target="_blank" rel="noopener">' + esc(tr.url.replace(/^https?:\/\//, "")) + " ↗</a>" : "") +
         "</div>";
     }).join("");
-    return '<section class="lsec"><div class="lsec-head"><h2>Recurring series on watch</h2>' +
-      '<span class="count">' + meta.tracked.length + '</span><span class="rule"></span></div>' +
+    return '<details class="lsec" data-sec="tracked"' + (secState.tracked ? " open" : "") + ">" +
+      secHead("Recurring series on watch", meta.tracked.length) +
       '<p class="lsec-hint">Backbone communities the daily refresh checks for each new instance.</p>' +
-      '<div class="trackgrid">' + cards + "</div></section>";
+      '<div class="trackgrid">' + cards + "</div></details>";
   }
   function renderList() {
     var t = today(), tk = dateKey(t.y, t.m, t.d), weekEnd = addDaysISO(tk, 6);
@@ -1140,13 +1166,23 @@
     var newItems = allEvents.filter(function (e) { return e.status === "new" && e.date && e.date >= tk; }).sort(asc);
     var newHint = (meta && meta.summary) ? meta.summary : "The newest finds from today's refresh.";
     var html =
-      lsection("What's new since last run", newHint, newItems.map(function (e) { return lrow(e, false); }), "whatsnew") +
-      lsection("This week", "Dated events in the next 7 days. Tap a row to expand.", thisWeek.map(function (e) { return lrow(e, false); })) +
-      lsection("Upcoming", "Soonest first; within a day, higher-scored first.", upcoming.map(function (e) { return lrow(e, false); })) +
-      lsection("To be confirmed", "Real finds with a date or time still to pin down.", tbcSorted.map(function (e) { return lrow(e, false); })) +
-      lsection("Past", null, past.map(function (e) { return lrow(e, true); })) +
+      lsection("What's new since last run", newHint, newItems.map(function (e) { return lrow(e, false); }), "whatsnew", "whatsnew") +
+      lsection("This week", "Dated events in the next 7 days. Tap a row to expand.", thisWeek.map(function (e) { return lrow(e, false); }), null, "thisweek") +
+      lsection("Upcoming", "Soonest first; within a day, higher-scored first.", upcoming.map(function (e) { return lrow(e, false); }), null, "upcoming") +
+      lsection("To be confirmed", "Real finds with a date or time still to pin down.", tbcSorted.map(function (e) { return lrow(e, false); }), null, "tbc") +
+      lsection("Past", null, past.map(function (e) { return lrow(e, true); }), null, "past") +
       gapsPanel() + trackedPanel();
-    document.getElementById("listView").innerHTML = html || '<div class="empty-note">No events.</div>';
+    var lv = document.getElementById("listView");
+    lv.innerHTML = html || '<div class="empty-note">No events.</div>';
+    // persist each section's collapse state as the viewer toggles it
+    [].forEach.call(lv.querySelectorAll("details.lsec[data-sec]"), function (d) {
+      d.addEventListener("toggle", function () {
+        var k = d.getAttribute("data-sec");
+        if (!k) return;
+        secState[k] = d.open;
+        try { localStorage.setItem(SEC_PREFIX + k, d.open ? "1" : "0"); } catch (e) {}
+      });
+    });
 
     var sub = allEvents.length + (allEvents.length === 1 ? " event" : " events");
     if (meta && (meta.lastRunLabel || meta.generatedAt)) {
