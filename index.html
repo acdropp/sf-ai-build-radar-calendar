@@ -794,10 +794,11 @@
     shown.forEach(function (ev) {
       var tier = scoreTier(ev);
       var nb = ev.status === "new" ? '<span class="nbadge">•</span>' : "";
+      var warn = regionInfo(ev).warn ? "⚠️ " : "";   // outside SF → flag on the chip
       var t2 = timeStr(ev);
-      var tip = (t2 ? t2 + "  ·  " : "") + ev.name;
+      var tip = warn + (t2 ? t2 + "  ·  " : "") + ev.name;
       html += '<a class="ev s-' + tier + (ev.needsVerification ? " verify" : "") + '" href="' + esc(ev.url) + '" target="_blank" rel="noopener" title="' + esc(tip) + '">' +
-        nb + esc(ev.name) + "</a>";
+        nb + warn + esc(ev.name) + "</a>";
     });
     if (crowded) {
       html += '<span class="morepill">+' + (evs.length - chipCap) + '<span class="tri"></span></span>';
