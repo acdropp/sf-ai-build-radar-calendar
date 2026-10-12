@@ -4,54 +4,58 @@ A self-hosted calendar + list view of the **SF AI Build Radar**: a daily-refresh
 taste-scored feed of hands-on AI builder events in the Bay Area (Luma, Meetup /
 Hacker Dojo, AI Tinkerers, and off-platform hacker houses).
 
-This folder is the **project workspace** — spec, handoff notes, and a sample data
-file. No application code has been built yet; this is the plan to build from.
+**Live:** https://acdropp.github.io/sf-ai-build-radar-calendar/ — opens for anyone, no account.
+
+## Status
+
+**Built and live.** Phases 1–4 are complete and deployed, plus a large slice of the
+Phase 5 extras (see `ROADMAP.md`). The site refreshes itself every morning from the
+Radar digest with no manual step.
 
 ## What's here
 
 | File | What it is |
 | --- | --- |
-| `SPEC.md` | The full build spec — architecture, data contract, phased milestones, acceptance criteria. Start here. |
-| `HANDOFF.md` | Short handoff: what to confirm before building, and the next move. |
-| `data/events.sample.json` | A hand-written sample `events.json` matching the data contract — the Phase-1 starter for binding the calendar to data. |
-| `.gitignore` | Standard ignores for when this becomes a git repo. |
-
-## Live (editable) versions of the docs
-
-These are the source documents; the `.md` files here are exported snapshots.
-
-- **Build spec:** https://claude.ai/code/artifact/255de9cb-7fb1-470a-82a1-f7e189eab37c
-- **Handoff & next steps:** https://claude.ai/code/artifact/a7090df4-acae-47c4-8d2d-43b7ffab6e60
+| `index.html` | The whole app — one self-contained page (calendar + list, theming, filters, all behavior). No build step, no framework. |
+| `data/events.json` | **The source of truth.** The daily sync writes it from the digest database; the page reads it. |
+| `data/events.sample.json` | A hand-written sample in the same shape — the Phase-1 fallback (also embedded in `index.html` for offline/dev). |
+| `scripts/build_events.py` | Deterministic transform: a dump of the digest DB → a clean, guarded `events.json`. Run by the daily sync task. |
+| `og-image.png` | Social-preview card (1200×630) referenced by the OpenGraph/Twitter tags. |
+| `SPEC.md` | The full as-built spec — architecture, data contract, features, pipeline, acceptance. |
+| `ROADMAP.md` | Phase-by-phase status (what shipped, what's declined). |
+| `HANDOFF.md` | Short operator's guide — how the pipeline runs, how to make changes. |
 
 ## The shape of it (one paragraph)
 
-A single `events.json` is the source of truth. The existing daily job (scrape →
-score 1–5 → dedupe) writes and commits that file to a GitHub repo (`acdropp`);
-GitHub Pages serves a static `index.html` that reads it and renders two switchable
-views — a 3-month synchronized calendar and the existing scored list. Because the
-data is committed into the repo and baked into what the browser downloads, the
-public URL opens for **anyone, with no account** — which is the whole point of
-going self-hosted instead of relying on a published artifact.
+A single `events.json` is the source of truth. A daily Claude scheduled task reads the
+existing Radar digest's database (scrape → score 1–5 → dedupe, already running), runs
+`scripts/build_events.py` to produce a clean file, and commits it to this repo. GitHub
+Pages serves a static `index.html` that reads it and renders two switchable views — a
+3-month synchronized calendar and a rich, collapsible scored list. Because the data is
+committed into the repo and baked into what the browser downloads, the public URL opens
+for **anyone, with no account** — the whole point of going self-hosted.
 
 ```
-Event sources ──▶ Daily job ──▶ events.json ──▶ GitHub Pages ──▶ Public page
-(Luma, Meetup,    (scrape ·     (source of       (static         (Calendar ⇄ List,
- Hacker Dojo,      score ·       truth, in         hosting)        no account needed)
- AI Tinkerers,     dedupe)       acdropp)
- web)
+Radar digest (artifact DB) ──▶ daily sync task ──▶ events.json ──▶ GitHub Pages ──▶ Public page
+(scrape · score · dedupe,       (dump DB ·          (source of        (static         (Calendar ⇄ List,
+ writes the DB ~6:52am PT)       build_events.py ·   truth, committed) hosting)        no account needed)
+                                 commit + push ~7:20am)
 ```
 
-## Build order (summary — see SPEC.md for detail)
+## Features (as built)
 
-1. Calendar bound to this sample `events.json`, locally.
-2. Real `events.json` export wired into the daily job.
-3. Public site stood up on GitHub Pages + commit/push from the job.
-4. List/calendar toggle + density polish.
-5. Optional: custom domain, Google Calendar subscribe mirror.
+- **Calendar view** — adaptive 3-month grid: portrait stacks months (≥2 visible), landscape fills one month; synchronized nav, month/year picker, Today, wheel-nav in landscape; score-based + past-day dimming; a day popover for crowded days; a collapsible "to be confirmed" shelf that drops out when it would squeeze the calendar.
+- **List view** — collapsible digest rows (date · name + format emojis · time · location · setting · score); expand for When / Where / Setting / Admission / Format / Source, theme bullets, a "why it fits you" note, **add-to-calendar** (`.ics` + Google Calendar), and the event link. Collapsible sections (What's new, This week, Upcoming, To be confirmed, Past) plus **Coverage gaps** and **Recurring series on watch** panels from the digest.
+- **Filter & search** — one collapsible card: keyword search + score ≥4, source, setting, SF-only, and hide-unverified/low-fit, applied to both views. All state lives in the URL for **shareable deep links** (e.g. `?v=list&s=4&dist=sf`).
+- **Light / dark theme** toggle, **social-preview** tags, a **stale-data banner** if the sync falls >36h behind, and a **print** stylesheet.
 
-Phases 1–3 get a shareable live calendar. 4 makes it the unified dashboard. 5 is upside.
+## Make a change
 
-## Status
+Edit `index.html` and push to `main`; GitHub Pages redeploys in ~1–2 minutes. The daily
+sync only ever writes `data/events.json`, so editing the page never collides with it.
+See `HANDOFF.md` for the full operator's guide.
 
-**Planning complete, build not started.** Phase 1 can begin against
-`data/events.sample.json` without any of the GitHub/hosting setup in place.
+## Earlier planning docs
+
+The original build spec and handoff were first drafted as live Claude docs; the
+canonical, current versions now live in this repo (`SPEC.md`, `HANDOFF.md`, `ROADMAP.md`).

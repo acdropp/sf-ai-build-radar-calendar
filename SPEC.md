@@ -1,214 +1,212 @@
-# SF AI Build Radar — Calendar + List Build Spec
+# SF AI Build Radar — Calendar + List Spec (as built)
 
-Oct 11, 2026 · @Aaron
+Updated Oct 12, 2026 · @Aaron
+
+> **Status: built and live** at https://acdropp.github.io/sf-ai-build-radar-calendar/.
+> This document now describes the system as it actually works. The original plan was
+> written forward-looking; this version reflects what shipped (Phases 1–4 plus most of
+> Phase 5 — see `ROADMAP.md`).
 
 ## Overview & goals
 
-Build a self-hosted web page that shows the SF AI Build Radar's events in two switchable views — a month-grid calendar and the existing scored list — both reading one shared event file, and host it as a plain website anyone can open with no account.
+A self-hosted web page that shows the SF AI Build Radar's events in two switchable
+views — a month-grid calendar and a rich scored list — both reading one shared event
+file, hosted as a plain website anyone can open with no account.
 
-This is an extension, not a rebuild. The Radar already scrapes, scores, and publishes a daily digest; what's missing is a visual calendar and a host that doesn't depend on an Anthropic login. The work is a frontend view plus a hosting/data move, sitting on top of the pipeline that already runs.
+This is an extension, not a rebuild. The Radar already scrapes, scores, and publishes a
+daily digest; this added a visual calendar and a host that doesn't depend on an
+Anthropic login. The goals, all met:
 
-Concrete goals this spec commits to:
+- **Two views, one data source.** A Calendar ⇄ List toggle, both bound to the same event records and the same filters. No second copy of the data.
+- **Shareable with anyone, no account.** A normal URL in any browser — no Claude/Anthropic sign-in, no app.
+- **Daily auto-updates.** The existing morning job keeps refreshing events; the published page reflects each day's run with no manual step.
+- **Own-your-stack resilience.** The source of truth lives in Aaron's own GitHub (`github.com/acdropp`) as a plain, version-controlled file — portable, diffable, platform-independent.
+- **Keep the taste signal.** The 1–5 fit score and the `new` / `needsVerification` flags carry through to both views, so quality stays visible at a glance.
 
-- **Two views, one data source.** A Calendar ⇄ List toggle, both bound to the same event records. No second copy of the data to keep in sync.
-- **Shareable with anyone, no account.** The people Aaron sends it to open a normal URL in any browser — no Claude/Anthropic sign-in, no app.
-- **Daily auto-updates.** The existing \~7:00am PT job keeps refreshing events; the published page reflects each day's run with no manual step.
-- **Own-your-stack resilience.** The source of truth lives in Aaron's own GitHub (`github.com/acdropp`) as a plain, version-controlled file — portable, diffable, and independent of any one platform.
-- **Keep the taste signal.** The 1–5 fit score and the `new` / `needs-verification` flags carry through to the calendar, so quality stays visible at a glance.
+## What the Radar already did (and still does)
 
-## What already exists today
+The spec builds on these parts and leaves them in place:
 
-The Radar is a running system, not a blank slate — the spec builds on these parts and leaves them in place:
+- **A daily scrape + score job** — sweeps Luma calendars, Meetup iCal feeds (including Hacker Dojo), AI Tinkerers, and web search for off-platform hacker houses, then scores each event 1–5 against Aaron's taste (hands-on, own-your-AI / local-first, in-person SF, community). South Bay / Peninsula / East Bay events are flagged for distance but kept.
+- **A stored event set** — events live in the Radar digest artifact's shared database (an `events` collection plus a `meta/run` record), written by the job.
+- **A published digest page** — the list-only view this calendar's list view is modeled on.
+- **A clean, calendar-ready schema** — every event already carries the fields a calendar needs. That schema is the contract below.
 
-- **A daily scrape + score job.** It sweeps Luma calendars, Meetup iCal feeds (including Hacker Dojo), AI Tinkerers, and web search for off-platform hacker houses, then scores each event 1–5 against Aaron's taste (hands-on, own-your-AI / local-first, in-person SF, community). South Bay & Peninsula events are flagged for distance but kept. It refreshes around 7:00am PT.
-- **A stored event set.** Events currently live in the Radar artifact's shared database (an `events` collection plus a `meta/run` record), written by the job and read by the page.
-- **A published digest page.** A list-only view, organized into sections — New, This week, All upcoming, Needs verification, Coverage gaps, Tracked series — each event a tap-to-expand row with its score as a 5-dot meter and a "why it fits you" note.
-- **A clean, calendar-ready schema.** Every event already carries the fields a calendar needs (date, times, venue, score, flags). That schema is the contract in the next section.
+**What this project changed:** it added the calendar + list site and moved the *source
+of truth and hosting* off the artifact platform into GitHub. It did **not** touch the
+scraping or scoring — those stay in the digest and simply gained a new consumer (a daily
+sync that commits a file).
 
-**What this project changes, precisely:** it adds a calendar view beside the list, and it moves the source of truth and the hosting off the artifact platform into Aaron's GitHub. It does **not** touch the scraping, scoring, or the daily schedule — those stay as-is and simply gain a new output target (a committed file) and a new reader (the self-hosted page).
+## Architecture
 
-## Target architecture
+A static site reads one committed file; a daily sync is the only thing that writes it.
+Nothing a public viewer loads depends on a database read or a login.
 
-A static site reads one committed file; the daily job is the only thing that writes it. Nothing a public viewer loads depends on a database read or a login.
+```
+Radar digest (artifact DB)  ──▶  daily sync task  ──▶  data/events.json  ──▶  GitHub Pages  ──▶  Public page
+scrape · score · dedupe,         dump DB ·              source of truth,       static            Calendar ⇄ List,
+writes DB ~6:52am PT             build_events.py ·      committed to repo      hosting           no account needed
+                                 commit + push ~7:20am
+```
 
-> _Architecture diagram (sources → daily job → GitHub file → public page) lives in the live doc; it renders as text here. The flow is described in the paragraph below and in the README._
-
-The move that matters: the source of truth leaves the artifact platform and becomes a plain `events.json` in Aaron's GitHub. That one change buys account-less public viewing (the data is baked into what the browser downloads), version history as a backup, and portability to any host or future tool — none of which the artifact-database-only setup can promise.
+The move that matters: the source of truth is a plain `events.json` in GitHub. That buys
+account-less public viewing (the data is baked into what the browser downloads), version
+history as a backup, and portability to any host — none of which an artifact-database-only
+setup can promise. The digest artifact remains **upstream** as the curation brain; the
+calendar never writes to it (read-only).
 
 ## Event data contract
 
-The source of truth is a single `events.json` file: an array of event objects, each following the shape below. The daily job writes it; both views read it. Lock this contract first — everything else binds to it.
+The source of truth is `data/events.json`: a `meta` object plus an `events` array of
+objects in the shape below. `scripts/build_events.py` writes it; both views read it.
 
 | Field | Type | Purpose |
 | --- | --- | --- |
-| `id` | string | Stable unique key (e.g. source + slug). Drives dedupe and calendar cell keys. |
+| `id` | string | Stable unique key (document slug). Drives dedupe, calendar cell keys, and `.ics` UIDs. |
 | `name` | string | Event title. |
 | `date` | string \| null | ISO `YYYY-MM-DD`. `null` when undated → routed to the TBC shelf, not the grid. |
 | `dateDisplay` | string | Human label for undated/fuzzy events ("Late Oct", "To be confirmed"). |
-| `startTime` | string | e.g. `18:00`. |
-| `endTime` | string | e.g. `21:00`. |
+| `startTime` / `endTime` | string | e.g. `9:00 AM` / `2:00 PM` (12-hour; parsed for calendar export). |
 | `tz` | string | Timezone label, default `PT`. |
-| `venue` | string | Venue name. |
-| `address` | string | Street address. |
-| `city` | string | City (drives the distance flag). |
-| `setting` | string | In-person / hybrid / online. |
-| `price` | string | Admission ("Free", "$20"). |
-| `membership` | string | Membership note, if any. |
-| `source` | string | Where it was found (Luma, Meetup, Hacker Dojo, web). |
-| `url` | string | Link to the event page — the calendar's click-through. |
-| `tags` | string\[\] | Short topic tags. |
-| `themes` | string\[\] | Longer theme phrases for the detail view. |
+| `venue` / `address` / `city` | string | Location. `city` drives the region flag (⚠️ + South Bay / East Bay / Online). |
+| `setting` | string | `in-person` / `hybrid` / `online`. |
+| `price` | string | Admission ("Free", "$20", "Not shown"). |
+| `membership` | string | Membership note (always shown in the list detail). |
+| `source` | string | Where it was found (Luma / Meetup / Hacker Dojo / …). Drives the source filter. |
+| `url` | string | Link to the event page — the click-through and calendar-export URL. |
+| `tags` | string[] | Format tags as `"emoji label"` (e.g. `"🦾 hackathon"`, `"🛠️ build"`). The list renders the emojis, normalized to a legend (🦾 hackathon, 🛠 build, 🎤 demo, 🗣 discussion, 🍻 social, 👩🏽‍🏫 lecture, 📚 book club). |
+| `themes` | string[] | 2–5 theme phrases for the expanded detail. |
 | `fit` | string | The "why it fits you" sentence. |
-| `score` | number | 1–5 taste score. Drives visual ranking on the grid. |
-| `status` | string | e.g. `new` — badges the event and left-accents its row. |
-| `distanceNote` | string | e.g. "South Bay — \~45 min". Present = distance badge. |
-| `needsVerification` | boolean | `true` = unconfirmed fields; dimmed + `verify` badge. |
+| `score` | number | 1–5 taste score. Drives ranking, dimming, and the score filter. |
+| `status` | string | `new` badges the event and left-accents its row; otherwise `seen`. |
+| `distanceNote` | string | e.g. "South Bay — ~45 min". Used for the region flag/badge. |
+| `needsVerification` | boolean | `true` = unconfirmed fields; `verify` badge. |
 
-A top-level `meta` object should travel alongside (`{ "generatedAt": "...", "runId": "...", "sourceCounts": {...} }`) so the page can show "last refreshed" and so each daily commit is self-describing.
-
-Example record:
+The top-level `meta` object (written each run):
 
 ```json
 {
-  "id": "luma-ai-tinkerers-2026-10-16",
-  "name": "AI Tinkerers SF — Build Night",
-  "date": "2026-10-16",
-  "startTime": "18:00",
-  "endTime": "21:00",
-  "tz": "PT",
-  "venue": "Shack15",
-  "city": "San Francisco",
-  "setting": "In-person",
-  "price": "Free",
-  "source": "Luma",
-  "url": "https://lu.ma/...",
-  "tags": ["agents", "demos"],
-  "fit": "Hands-on build night, local-first crowd, in SF proper.",
-  "score": 5,
-  "status": "new",
-  "needsVerification": false
+  "generatedAt": "2026-10-12T14:00:02Z",
+  "lastRunLabel": "Oct 12, 2026 · 7:00am PT",
+  "source": "SF AI Build Radar digest (artifact DB)",
+  "eventCount": 51, "newCount": 6, "datedCount": 45,
+  "summary": "6 new today: …",
+  "gaps": ["…coverage gaps this run…"],
+  "tracked": [{ "name": "…", "url": "…", "why": "…" }]
 }
 ```
 
-## Frontend — calendar + list views
+`generatedAt` drives the "data as of" line and the stale-data banner; `summary` is the
+intro of the "What's new" section; `gaps` and `tracked` power the two bottom panels.
 
-One self-contained page, two views behind a toggle, both fed by `events.json`. The list view is the existing digest, carried over. The calendar view is new and is where most of the build effort goes.
+## Frontend — one self-contained `index.html`
 
-**The toggle.** A persistent List ⇄ Calendar switch in the header. Same data, same filters apply to both. Default to Calendar (Aaron is visual), remember the last choice in `localStorage` as a per-viewer convenience only.
+One page, no framework, no build step; two views behind a toggle, both fed by the same
+filtered event set. Default view is Calendar (remembered per viewer); the whole thing
+themes light/dark (dark default; light uses the digest's color scheme).
 
-**Calendar view — the adaptive month dashboard.** Reuse the prototype Aaron already designed. Core requirements carried from that spec:
+### Calendar view
 
-- **Layout adapts to the tile shape:** a landscape/wide tile shows one month grown to fill the tile; a portrait/tall tile stacks months with at least two visible at once. Reference month defaults to the current month.
-- **Synchronized navigation:** the back/forward arrows and the month/year picker move the reference month; in the stacked view every visible month shifts together, never independently.
-- A clickable month/year heading opens a month+year picker; the chosen month lands in the calendar whose heading was clicked, and the others re-sequence around it. Works across year boundaries.
-- **Responsive:** portrait/tall tiles stack the months vertically with at least two visible; a landscape/wide tile shows a single month filling the tile. Recompute on resize or orientation change without losing the reference month.
-- **Mouse wheel is context-aware:** in the stacked (portrait) view it scrolls the page; in the single-month (landscape) fill view, where the page doesn't scroll, it navigates months (wheel down = next month, up = previous). No nested scroll region hijacks the wheel.
-- A **Today** button resets to the current month and scrolls to top.
-- Dark charcoal theme, lighter rounded panels, one accent color, today's date distinguished.
+- **Adaptive layout:** landscape shows one month grown to fill the tile; portrait stacks months with at least two visible. Reference month defaults to the current month.
+- **Synchronized nav:** arrows and the month/year picker move the reference month; in the stacked view every visible month shifts together. The picker lands the chosen month in the calendar whose heading was clicked; works across year boundaries.
+- **Context-aware wheel:** scrolls the page in the stacked view; navigates months in the single-month landscape fill view.
+- **Today** resets to the current month. A clickable month/year heading opens the picker.
+- **Event chips** show name-first (with a "new" dot), link out to `url`, and carry score tier + verify styling. **Score + past dimming:** score ≤2 / `needsVerification` / past days are dimmed but never hidden.
+- **Crowded days** cap chips per cell and show a "+N ▲" triangle that opens an **anchored day popover** (fit-to-content, capped scroll, keyboard nav, edge-flipping).
+- **TBC shelf** ("No date yet · to be confirmed") sits below the calendar, is **collapsible** (default collapsed), and is **dropped automatically in short landscape** so it never squeezes the grid below a legible height.
 
-**Binding events onto the grid.** For each day cell, render the events whose `date` matches. Each event chip shows name + time, links out to `url`, and carries its score and flags visually.
+### List view
 
-**Score-based density (the key decision applied).** Show everything, but rank it:
+- **Collapsible digest rows.** Collapsed: `mm/dd · name (+ ⚠️ if outside SF) · format emojis · time · location · setting · score meter`. Expand for a `When / Where / Setting / Admission (price + membership) / Format / Source` block, 2–5 theme bullets, a "Why it fits you" box, **Add to calendar** (`.ics` + Google Calendar), and the event link.
+- **Collapsible sections**, each remembering its state, with defaults: This week (open), Upcoming (open), What's new since last run (collapsed), To be confirmed (collapsed), Past (collapsed). Order: This week → Upcoming → What's new → To be confirmed → Past.
+- **Coverage gaps this run** and **Recurring series on watch** panels (collapsed by default) render `meta.gaps` and `meta.tracked`.
+- **Region flags:** ⚠️ in the title when outside SF, plus a South Bay / East Bay / Online badge; NEW and VERIFY badges throughout.
 
-- Score 4–5: full weight, accent-tinted.
-- Score 3: normal.
-- Score ≤ 2 and `needsVerification`: dimmed / muted so the grid stays scannable without hiding anything.
-- `status: new` gets a small badge; `distanceNote` gets a distance badge.
+### Filter, search & sharing
 
-**The TBC shelf.** Undated events (`date: null`) can't sit in a grid. Render them in a labeled "No date yet" strip above or below the calendar so they never silently vanish — a real failure mode given how many community events are announced before they're scheduled.
+- **One collapsible "Filter & search" card** (bordered like the TBC shelf, collapsed by default; auto-opens only when a deep link arrives with filters). Applies to **both views**:
+  keyword search (name / venue / city / themes / tags / fit), score ≥4, source (Luma / Meetup / Hacker Dojo), setting (in-person / online), SF-only distance, and hide unverified/low-fit. Live match count + Clear.
+- **Shareable deep links:** view, month, and every filter are mirrored to the URL — e.g. `?v=list&s=4&dist=sf`, `?v=calendar&m=2026-11`.
 
-**A day with many events.** Cap visible chips per cell (e.g. 3), then a "+N more" affordance that expands the day or opens a day detail. Prevents tall, ragged rows.
+### Add to calendar (per event)
 
-**List view.** The existing scored, sectioned digest — unchanged in logic, restyled only as needed to share the page's header and toggle.
+Each dated event's detail offers an **`.ics` download** (data-URI, with an
+`America/Los_Angeles` `VTIMEZONE` so times import correctly across Apple/Google/Outlook,
+and `VALUE=DATE` all-day when no start time) and a **Google Calendar** template link.
+
+### Other
+
+- **Social preview** — OpenGraph / Twitter tags + `og-image.png` (titled card in Slack / iMessage / Discord).
+- **Stale-data banner** — shown when `generatedAt` is >36h old, so a silently-broken sync is visible.
+- **Print stylesheet** — a clean, expanded list handout; **mobile** list refinements.
 
 ## Daily data pipeline
 
-The daily job keeps doing what it does — scrape, score, dedupe — and gains one new final step: write `events.json` and commit it to the repo. The published site is static, so no live database read happens when a viewer loads the page; they get whatever the last commit baked in.
+Two Claude scheduled tasks run each morning:
 
-The daily sequence:
+1. **~6:52am PT — digest refresh.** Scrapes, scores, dedupes, and writes the results into the digest artifact's database (`events` + `meta/run`, including `summary` / `newIds` / `gaps` / `tracked`). Unchanged from the pre-existing Radar; the calendar reuses it.
+2. **~7:20am PT — events.json sync.** Clones this repo, dumps the digest DB with the ArtifactData tool, runs `scripts/build_events.py`, and commits + pushes **only if the data changed**. GitHub Pages redeploys in ~1–2 min.
 
-1. **Scrape** the sources (Luma, Meetup/Hacker Dojo iCal, AI Tinkerers, web) — unchanged.
-2. **Score** each event 1–5 against the taste profile — unchanged.
-3. **Dedupe** across sources by stable `id`, so the same event from Luma and Meetup collapses to one record.
-4. **Serialize** the full set to `events.json` in the contract shape, plus the `meta` block (run time, counts).
-5. **Commit & push** the file to `github.com/acdropp/<repo>`. GitHub Pages redeploys automatically on push, so the public page updates within a minute or two.
+`build_events.py` is deterministic (stable id from the doc key, sort by date then score,
+`newIds` → `status:"new"`, pass `summary`/`gaps`/`tracked` through) so unchanged runs are
+no-op diffs. Its **guardrail** refuses to write (exit 2) when the dump has fewer than
+`--min-events` events or fewer than 50% of the previously published count — a broken or
+partial scrape can't wipe the calendar. Commit messages double as a changelog, e.g.
+`radar: 2026-10-12 PT sync (51 events, 6 new)`.
 
-Practical requirements:
-
-- **Write credentials.** The job needs push rights to the repo — a fine-grained Personal Access Token or a deploy key scoped to that one repo. This is the one new secret to manage; keep it out of the committed files.
-- **Idempotency.** Re-running the job the same day should produce the same file (stable ordering, stable ids) so commits only appear when something actually changed — clean git history, no noise.
-- **Commit message = a daily marker.** e.g. `radar: 2026-10-11 run (42 events, 3 new)`. The git log becomes a free changelog of what the Radar saw each day.
-- **Dual-write option (transitional).** The job can keep writing the artifact database *and* the JSON during changeover, so nothing breaks while the self-hosted page is being stood up. Drop the DB write once the site is the primary surface.
-- **Scheduling.** A truly unattended daily run wants a real scheduler (a GitHub Action on a cron, or the existing scheduled task that already drives the 7am refresh) rather than a person pressing go. Decide which owns the schedule — see Open decisions.
+**Push access** is via the **Claude GitHub App**; commits use the noreply email
+`247266112+acdropp@users.noreply.github.com` to avoid GitHub's email-privacy rejection.
 
 ## Hosting, sharing & resilience
 
-**Host:** GitHub Pages, served from the `acdropp` repo. The page (`index.html`) and `events.json` live in the repo; every push redeploys. Result: a public URL like `acdropp.github.io/<repo>` that opens in any browser with **no Claude or Anthropic account required** — which is the whole reason for going self-hosted rather than relying on a published artifact.
+- **Host:** GitHub Pages, served from the public `acdropp/sf-ai-build-radar-calendar` repo. Every push redeploys. Public URL opens in any browser with **no Claude/Anthropic account**.
+- **Why it meets "share with anyone":** the data is committed into the repo and baked into what the browser downloads, so there's no "beautiful empty calendar" failure mode a live-DB page could have.
+- **Audit trail, for free:** git history *is* a daily backup and a record of what changed run to run.
+- **Custom domain (optional, not done):** supported via a `CNAME` + DNS record if wanted later.
 
-**Why this meets the "share with anyone" requirement cleanly.** A published Claude artifact *can* be viewed without an account, but the Radar's data loads from the artifact database, and there's no guarantee a logged-out stranger's browser reads that database — they could open a beautiful, empty calendar. A static page with the data committed into the repo has no such failure mode: the events are just there in the file the browser downloads.
+## Decisions (resolved)
 
-**Custom domain (optional).** GitHub Pages supports a custom domain via a `CNAME` file + DNS record — e.g. `radar.<aarondomain>`. Nice-to-have, not required for launch.
+- **Schedule owner:** the existing Claude scheduled tasks drive it (not a GitHub Action). Two tasks: digest refresh, then events.json sync.
+- **Push credentials:** the Claude GitHub App (no PAT to manage); noreply commit email.
+- **Fate of the artifact:** **kept** as the upstream curation brain and preview surface. (Note the one-way door: unpublishing a Claude artifact is permanent — don't unpublish; just stop sharing the link.)
+- **Scrape fragility:** handled by the build-script guardrail (skip the commit on too-few events) + the stale-data banner on the page.
+- **Snapshot vs live:** static-snapshot by design — as fresh as the last successful sync, which is what makes account-less viewing reliable.
+- **Google Calendar subscribe feed:** **declined** (Oct 12). Per-event add-to-calendar covers the need; a whole-calendar `.ics` feed can still be added later as another consumer of the same JSON.
+- **Retire the artifact-DB dependency:** **declined** — the DB hop works and keeps the LLM curation in place.
 
-**Static.app as an alternative host.** If GitHub Pages setup is friction, Static.app can import an artifact's public link or a copied HTML bundle and serve it as a standalone site with its own URL and optional custom domain. Same end state (account-less public page); different front door.
-
-**Resilience / audit trail, for free.** Because the source of truth is a committed JSON file, git history *is* a daily backup and a visible record of what changed run to run. Nothing depends on a single platform staying up or a single login working.
-
-**Deferred: Google Calendar subscribe.** A one-way nightly push from `events.json` into a public Google Calendar would let people click "add to my calendar" and get events in their own app. Aaron chose view-only for now, so this stays parked — easy to add later, no architectural conflict, just another consumer of the same JSON.
-
-## Build sequence — phased milestones
-
-Ordered so each phase ends in something that works and is worth looking at. A future Claude Code session can pick this up phase by phase.
-
-1. **Calendar bound to sample data (local).** Take the 3-month prototype, define `events.json`, hand-write \~15 sample records across the current and next two months (include a few score-2s, a `needsVerification`, and a `date: null`). Bind events onto the grid, add score-based dimming and the TBC shelf. *Done when:* the prototype shows real-looking events, correctly placed and ranked, opened as a local file.
-2. **Real export from the job.** Add the serialize-and-write step to the daily job so it emits the real `events.json` from live scraped data. *Done when:* a run produces a valid file the Phase 1 page renders with no code changes.
-3. **Stand up the public site.** Create/choose the `acdropp` repo, add `index.html` + `events.json`, enable GitHub Pages, wire the job's commit+push with a scoped token. *Done when:* the public URL opens in a logged-out incognito window and shows today's events.
-4. **List/calendar toggle + polish.** Fold the existing list view into the page behind the toggle, share the header and filters, tune density, the "+N more" day overflow, and the "last refreshed" stamp from `meta`. *Done when:* both views are switchable on the live site and read the same data.
-5. **Optional extras.** Custom domain; the one-way Google Calendar subscribe mirror; retiring the dual-write to the artifact DB once the site is primary. *Done when:* whichever of these Aaron decides he wants is live.
-
-Phases 1–3 are the real milestone (a shareable live calendar). 4 makes it the unified dashboard. 5 is upside.
-
-## Open decisions, risks & future options
-
-Still Aaron's calls — none block starting Phase 1, but they shape later phases:
-
-- **Who owns the schedule?** Keep the current scheduled task as the daily driver, or move the cron into a GitHub Action? The Action keeps everything in one repo and runs even if other tooling changes; the existing task already works. *Lean: whichever is less fragile to Aaron day-to-day — likely the GitHub Action once the repo exists.*
-- **Token handling for the commit step.** A fine-grained PAT or deploy key scoped to the one repo, stored as a secret (GitHub Actions secret, or wherever the job runs). Don't let it touch a committed file. Low effort, but it's the one real security surface.
-- **Fate of the original artifact.** Keep it as a staging/preview surface while iterating, or retire it once the site is live? Note the one-way door: **unpublishing a Claude artifact is permanent — you can't republish the same one.** So don't unpublish casually; just stop sharing its link.
-- **Scrape fragility.** Luma/Meetup markup and feeds change; a silent scrape break would freeze the calendar at the last good run. Worth a cheap guardrail: if a run finds zero events or far fewer than yesterday, skip the commit and flag it rather than publishing an empty calendar.
-- **Snapshot vs live.** This spec commits to the static-snapshot model (data baked into each commit). That's the right call for account-less viewing and simplicity; the tradeoff is the page is as fresh as the last run, not real-time — fine for a daily radar.
-- **Deferred, not dropped — Google Calendar subscribe.** Revisit if people start asking "can I get these in my own calendar?" It's additive, reads the same JSON, and doesn't disturb anything built here.
-
-## Acceptance criteria
-
-Call it done when all of these hold:
+## Acceptance criteria — all met
 
 **Sharing & data**
 
-- [ ] The public URL opens in a logged-out incognito window, on a device with no Claude account, and shows today's events.
-- [ ] The page reads a single `events.json`; both views use it; there's no second data copy.
-- [ ] A daily job run updates the live page within a few minutes, with no manual step.
-- [ ] The git history shows one commit per changed run, each with a descriptive message.
+- [x] The public URL opens logged-out, no Claude account, and shows today's events.
+- [x] The page reads a single `events.json`; both views use it; no second data copy.
+- [x] A daily run updates the live page within a few minutes, no manual step.
+- [x] Git history shows one commit per changed run with a descriptive message.
 
-**Calendar behavior** (from the prototype spec)
+**Calendar behavior**
 
-- [ ] Portrait stacks months with at least two visible at once; landscape shows one month grown to fill the tile.
-- [ ] In the stacked view, clicking either arrow on any month shifts every visible month by exactly one month together.
-- [ ] Clicking any month heading opens the month/year picker; the chosen month lands in that calendar and the others re-sequence.
-- [ ] Navigation across a December→January boundary works correctly.
-- [ ] Rotating or resizing between portrait and landscape re-lays-out (stacked ↔ single-month fill) without losing the reference month.
-- [ ] Mouse wheel scrolls the page in the stacked view, and navigates months (up/down) in the single-month landscape view.
-- [ ] Today returns to the current month and scrolls to top.
+- [x] Portrait stacks ≥2 months; landscape fills one month.
+- [x] Any arrow shifts every visible month together by one.
+- [x] The month/year picker lands the chosen month in that calendar; others re-sequence.
+- [x] December→January navigation works.
+- [x] Resize/rotate re-lays-out (stacked ↔ single-month fill) without losing the reference month.
+- [x] Wheel scrolls in stacked view; navigates months in single-month landscape.
+- [x] Today returns to the current month and scrolls to top.
 
 **Views & density**
 
-- [ ] A List ⇄ Calendar toggle switches views; the last choice is remembered.
-- [ ] Score ≤ 2 and `needsVerification` events appear but are visually dimmed, not hidden.
-- [ ] `new` and distance events carry their badges on the grid.
-- [ ] Undated (`date: null`) events appear in the TBC shelf, reachable, never dropped.
-- [ ] A day with many events caps its chips and offers "+N more".
-- [ ] Every event chip links out to its source `url`.
+- [x] A List ⇄ Calendar toggle switches views; last choice remembered.
+- [x] Score ≤2 / `needsVerification` events appear but are dimmed, not hidden.
+- [x] `new` and distance/region events carry badges.
+- [x] Undated events appear in the (collapsible) TBC shelf, never dropped.
+- [x] Crowded days cap chips and offer a "+N" day popover.
+- [x] Every event links out to its source `url`.
 
 **Robustness**
 
-- [ ] A run that finds zero / far fewer events than usual does not publish an empty calendar.
-- [ ] All dates render without clipping or overlap on both desktop and mobile widths.
+- [x] A run with zero / far-fewer events does not publish an empty calendar (build-script guardrail).
+- [x] Dates render without clipping on desktop and mobile widths.
+
+**Beyond the original bar (Phase 5):** theme toggle, rich collapsible list, filters +
+search + hide, shareable deep links, per-event calendar export, social preview, coverage
+gaps / tracked panels, stale-data banner, collapsible sections, print styles.
