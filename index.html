@@ -475,7 +475,7 @@
   .l-btn.ghost:hover { background: var(--accent-weak); }
 
   /* What's-new highlight + coverage/tracked panels (list view) */
-  .lsec.whatsnew .lsec-head h2 { color: var(--accent); }
+  .lsec.whatsnew .lsec-head h2 { color: var(--fg); }
   .lpanel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
   .lpanel.gaps { border-left: 3px solid var(--amber); }
   .lpanel ul { margin: 0; padding-left: 18px; }
@@ -1181,9 +1181,9 @@
     var newItems = allEvents.filter(function (e) { return e.status === "new" && e.date && e.date >= tk; }).sort(asc);
     var newHint = (meta && meta.summary) ? meta.summary : "The newest finds from today's refresh.";
     var html =
-      lsection("What's new since last run", newHint, newItems.map(function (e) { return lrow(e, false); }), "whatsnew", "whatsnew") +
       lsection("This week", "Dated events in the next 7 days. Tap a row to expand.", thisWeek.map(function (e) { return lrow(e, false); }), null, "thisweek") +
       lsection("Upcoming", "Soonest first; within a day, higher-scored first.", upcoming.map(function (e) { return lrow(e, false); }), null, "upcoming") +
+      lsection("What's new since last run", newHint, newItems.map(function (e) { return lrow(e, false); }), "whatsnew", "whatsnew") +
       lsection("To be confirmed", "Real finds with a date or time still to pin down.", tbcSorted.map(function (e) { return lrow(e, false); }), null, "tbc") +
       lsection("Past", null, past.map(function (e) { return lrow(e, true); }), null, "past") +
       gapsPanel() + trackedPanel();
