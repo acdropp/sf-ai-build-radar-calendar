@@ -107,6 +107,7 @@
     flex-direction: column;
     gap: 16px;
   }
+  .cals[hidden] { display: none; }   /* the class rule above would otherwise beat the hidden attribute */
 
   /* Landscape / wide tile: one month grows to fill the tile for large, readable day blocks. */
   @media (orientation: landscape) {
@@ -119,6 +120,9 @@
     header.app { position: static; margin: 0 -20px 14px; padding: 12px 20px; }
     footer.legend { flex: 0 0 auto; margin-top: 14px; padding-top: 12px; }
     .tbc { margin-bottom: 14px; flex: 0 0 auto; }
+    /* List view scrolls normally even in landscape — the single-month fill only applies to the calendar */
+    body.view-list .wrap { height: auto; overflow: visible; padding-bottom: 48px; }
+    body.view-list header.app { position: sticky; top: 0; }
 
     .cals.one { flex: 1 1 auto; min-height: 0; }
     .cals.one .cal { height: 100%; display: flex; flex-direction: column; }
@@ -182,6 +186,10 @@
   .cell .dnum { font-family: var(--font-mono); font-size: 0.68rem; color: var(--muted); font-variant-numeric: tabular-nums; padding-left: 1px; }
   .cell.today { border-color: var(--accent-line); background: var(--accent-weak); }
   .cell.today .dnum { color: var(--accent); font-weight: 600; }
+  /* Past days stay on the calendar but are dimmed, like low-fit/unverified events */
+  .cell.past { background: color-mix(in srgb, var(--surface-2) 45%, transparent); }
+  .cell.past .dnum { color: var(--faint); }
+  .cell.past .ev { opacity: 0.4; }
 
   /* Event chips inside a day cell */
   .ev {
@@ -277,6 +285,45 @@
   .dp-row .r-meta { font-family: var(--font-mono); font-size: 0.66rem; color: var(--muted); margin-top: 3px; display: flex; flex-wrap: wrap; gap: 3px 9px; }
   .dp-row .meter { margin-left: auto; }
 
+  /* View toggle (Calendar / List) */
+  .head-right { display: flex; align-items: center; gap: 10px; }
+  .viewtoggle { display: inline-flex; background: var(--surface-2); border: 1px solid var(--line); border-radius: 9px; padding: 2px; }
+  .vt { font-family: var(--font-body); font-weight: 600; font-size: 0.82rem; color: var(--muted); background: none; border: none; border-radius: 7px; padding: 6px 13px; cursor: pointer; transition: background 0.12s ease, color 0.12s ease; }
+  .vt[aria-selected="true"] { background: var(--accent); color: var(--accent-fg); }
+  .vt:not([aria-selected="true"]):hover { color: var(--fg); }
+  .vt:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* List view (the scored digest) */
+  .listview { display: flex; flex-direction: column; gap: 26px; }
+  .listview[hidden] { display: none; }
+  .lsec { }
+  .lsec-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .lsec-head h2 { font-size: 0.74rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--fg); margin: 0; }
+  .lsec-head .count { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); background: var(--surface-2); border-radius: 20px; padding: 1px 9px; }
+  .lsec-head .rule { flex: 1; height: 1px; background: var(--line); }
+  .lrows { display: flex; flex-direction: column; gap: 8px; }
+  .lrow {
+    display: grid; grid-template-columns: 56px 1fr auto; column-gap: 14px; row-gap: 2px;
+    grid-template-areas: "date name score" "date meta score" "date fit score";
+    text-decoration: none; color: var(--fg); background: var(--surface);
+    border: 1px solid var(--line); border-left: 3px solid var(--line-strong); border-radius: 12px; padding: 12px 14px;
+  }
+  .lrow:hover { border-color: var(--line-strong); }
+  .lrow.hi { border-left-color: var(--accent); }
+  .lrow.dim { opacity: 0.5; }
+  .l-date { grid-area: date; font-family: var(--font-mono); font-size: 0.82rem; font-weight: 600; color: var(--accent); font-variant-numeric: tabular-nums; padding-top: 1px; }
+  .l-date .tbc { color: var(--faint); font-weight: 500; font-size: 0.72rem; }
+  .l-name { grid-area: name; font-weight: 650; font-size: 0.95rem; letter-spacing: -0.01em; }
+  .l-meta { grid-area: meta; font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 3px 12px; margin-top: 3px; }
+  .l-fit { grid-area: fit; font-size: 0.82rem; color: var(--muted); margin-top: 6px; }
+  .l-score { grid-area: score; display: flex; flex-direction: column; align-items: flex-end; gap: 5px; padding-top: 1px; }
+  .l-badges { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; max-width: 120px; }
+  @media (max-width: 560px) {
+    .lrow { grid-template-columns: 52px 1fr; grid-template-areas: "date name" "date meta" "date fit" "date score"; }
+    .l-score { align-items: flex-start; flex-direction: row; gap: 10px; margin-top: 6px; }
+    .l-badges { justify-content: flex-start; }
+  }
+
   /* Legend */
   footer.legend { margin-top: 24px; padding-top: 14px; border-top: 1px solid var(--line); font-family: var(--font-mono); font-size: 0.68rem; color: var(--faint); display: flex; flex-wrap: wrap; gap: 6px 18px; }
   footer.legend .k { display: inline-flex; align-items: center; gap: 6px; }
@@ -293,10 +340,16 @@
   <header class="app">
     <div class="headrow">
       <div>
-        <h1><span class="spark">◆</span> SF AI Build Radar — Calendar</h1>
+        <h1><span class="spark">◆</span> SF AI Build Radar</h1>
         <div class="sub" id="sub">loading…</div>
       </div>
-      <button class="btn-today" id="todayBtn" type="button">Today</button>
+      <div class="head-right">
+        <div class="viewtoggle" id="viewToggle" role="tablist" aria-label="View">
+          <button class="vt" data-view="calendar" role="tab" aria-selected="true" type="button">Calendar</button>
+          <button class="vt" data-view="list" role="tab" aria-selected="false" type="button">List</button>
+        </div>
+        <button class="btn-today" id="todayBtn" type="button">Today</button>
+      </div>
     </div>
   </header>
 
@@ -306,6 +359,7 @@
   </section>
 
   <main class="cals" id="cals" aria-live="polite"></main>
+  <main class="listview" id="listView" aria-live="polite" hidden></main>
 
   <footer class="legend">
     <span class="k"><span class="sw high"></span> strong fit (4–5)</span>
@@ -382,12 +436,23 @@
   var ref = { y: 0, m: 0 };     // month shown in the FIRST calendar
   var byDate = {};              // "YYYY-MM-DD" -> [events]
   var tbc = [];                 // events with no date
+  var allEvents = [];           // flat list (for the List view)
   var meta = null;
   var pickerPanelIndex = 0;     // which calendar's heading opened the picker
+  var VIEW_KEY = "radar-view";
+  var view = "calendar";        // "calendar" | "list"
+  try { view = localStorage.getItem(VIEW_KEY) || "calendar"; } catch (e) {}
+  if (view !== "list") view = "calendar";
 
   // ----- Pure date helpers -----
   function pad(n) { return (n < 10 ? "0" : "") + n; }
   function dateKey(y, m, d) { return y + "-" + pad(m + 1) + "-" + pad(d); }
+  function addDaysISO(iso, n) {
+    var p = iso.split("-");
+    var d = new Date(+p[0], +p[1] - 1, +p[2]);
+    d.setDate(d.getDate() + n);
+    return dateKey(d.getFullYear(), d.getMonth(), d.getDate());
+  }
   function daysInMonth(y, m) { return new Date(y, m + 1, 0).getDate(); } // handles leap years
   function firstWeekday(y, m) { return new Date(y, m, 1).getDay(); }      // 0=Sun
   function addMonths(y, m, delta) {
@@ -420,6 +485,7 @@
   function normalize(data) {
     var events = Array.isArray(data) ? data : (data && data.events) || [];
     meta = (data && data.meta) || null;
+    allEvents = events.slice();
     byDate = {};
     tbc = [];
     events.forEach(function (ev) {
@@ -451,8 +517,9 @@
     var key = dateKey(y, m, d);
     var evs = byDate[key] || [];
     var isToday = (t && y === t.y && m === t.m && d === t.d);
+    var isPast = t && key < dateKey(t.y, t.m, t.d);   // whole day already passed
     var crowded = evs.length > chipCap;
-    var cls = "cell" + (evs.length ? " has" : "") + (isToday ? " today" : "") + (crowded ? " crowded" : "");
+    var cls = "cell" + (evs.length ? " has" : "") + (isToday ? " today" : "") + (crowded ? " crowded" : "") + (isPast ? " past" : "");
     var html = '<div class="' + cls + '"' + (evs.length ? ' data-day="' + key + '"' : "") + '>';
     html += '<span class="dnum">' + d + "</span>";
 
@@ -544,6 +611,98 @@
         '<span class="when">' + esc(when) + '</span>' +
         '<span class="nm">' + esc(ev.name) + "</span></a>";
     }).join("");
+  }
+
+  // ----- List view (the scored digest, reading the same events) -----
+  function mmddShort(iso) {
+    var p = iso.split("-");
+    return MONTHS_SHORT[+p[1] - 1] + " " + (+p[2]);
+  }
+  function lrow(ev, isPast) {
+    var score = ev.score || 0;
+    var dim = isPast || score <= 2 || ev.needsVerification;
+    var hi = (!dim && score >= 4) ? " hi" : "";
+    var meter = "";
+    for (var k = 1; k <= 5; k++) meter += '<i class="' + (k <= score ? "on" : "") + '"></i>';
+    var dateCell = ev.date
+      ? "<span>" + esc(mmddShort(ev.date)) + "</span>"
+      : '<span class="tbc">' + esc(ev.dateDisplay || "TBC") + "</span>";
+    var time = ev.startTime ? (ev.startTime + (ev.endTime ? "–" + ev.endTime : "") + " " + (ev.tz || "PT")) : "";
+    var loc = [ev.venue, ev.city].filter(Boolean).join(", ");
+    var bits = [];
+    if (time) bits.push("<span>" + esc(time) + "</span>");
+    if (loc) bits.push("<span>" + esc(loc) + "</span>");
+    if (ev.price) bits.push("<span>" + esc(ev.price) + "</span>");
+    if (ev.source) bits.push("<span>" + esc(ev.source) + "</span>");
+    var badges = "";
+    if (ev.status === "new") badges += '<span class="pill new">new</span>';
+    if (ev.distanceNote) badges += '<span class="pill dist">' + esc(ev.distanceNote.split("—")[0].trim()) + "</span>";
+    if (ev.needsVerification) badges += '<span class="pill verify">verify</span>';
+    return '<a class="lrow' + hi + (dim ? " dim" : "") + '" href="' + esc(ev.url) + '" target="_blank" rel="noopener">' +
+      '<span class="l-date">' + dateCell + "</span>" +
+      '<span class="l-name">' + esc(ev.name) + "</span>" +
+      '<span class="l-meta">' + bits.join("") + "</span>" +
+      (ev.fit ? '<span class="l-fit">' + esc(ev.fit) + "</span>" : "") +
+      '<span class="l-score"><span class="meter">' + meter + "</span>" +
+      (badges ? '<span class="l-badges">' + badges + "</span>" : "") + "</span>" +
+      "</a>";
+  }
+  function lsection(title, rows) {
+    if (!rows.length) return "";
+    return '<section class="lsec"><div class="lsec-head"><h2>' + esc(title) + "</h2>" +
+      '<span class="count">' + rows.length + '</span><span class="rule"></span></div>' +
+      '<div class="lrows">' + rows.join("") + "</div></section>";
+  }
+  function renderList() {
+    var t = today(), tk = dateKey(t.y, t.m, t.d), weekEnd = addDaysISO(tk, 6);
+    var thisWeek = [], upcoming = [], past = [];
+    allEvents.forEach(function (ev) {
+      if (!ev.date) return;               // undated handled from `tbc`
+      if (ev.date < tk) past.push(ev);
+      else if (ev.date <= weekEnd) thisWeek.push(ev);
+      else upcoming.push(ev);
+    });
+    var asc = function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : (b.score || 0) - (a.score || 0); };
+    var desc = function (a, b) { return a.date > b.date ? -1 : a.date < b.date ? 1 : (b.score || 0) - (a.score || 0); };
+    var byScore = function (a, b) { return (b.score || 0) - (a.score || 0); };
+    thisWeek.sort(asc); upcoming.sort(asc); past.sort(desc);
+    var tbcSorted = tbc.slice().sort(byScore);
+    var html =
+      lsection("This week", thisWeek.map(function (e) { return lrow(e, false); })) +
+      lsection("Upcoming", upcoming.map(function (e) { return lrow(e, false); })) +
+      lsection("To be confirmed", tbcSorted.map(function (e) { return lrow(e, false); })) +
+      lsection("Past", past.map(function (e) { return lrow(e, true); }));
+    document.getElementById("listView").innerHTML = html || '<div class="empty-note">No events.</div>';
+
+    var sub = allEvents.length + (allEvents.length === 1 ? " event" : " events");
+    if (meta && (meta.lastRunLabel || meta.generatedAt)) {
+      sub += "  ·  updated " + (meta.lastRunLabel || String(meta.generatedAt).slice(0, 10));
+    }
+    document.getElementById("sub").textContent = sub;
+  }
+
+  function setView(v) {
+    view = (v === "list") ? "list" : "calendar";
+    try { localStorage.setItem(VIEW_KEY, view); } catch (e) {}
+    document.body.classList.toggle("view-list", view === "list");
+    [].forEach.call(document.querySelectorAll("#viewToggle .vt"), function (b) {
+      b.setAttribute("aria-selected", b.getAttribute("data-view") === view ? "true" : "false");
+    });
+    closeDayPop();
+    var cals = document.getElementById("cals");
+    var list = document.getElementById("listView");
+    if (view === "list") {
+      cals.hidden = true;
+      document.getElementById("tbcShelf").hidden = true;
+      list.hidden = false;
+      renderList();
+    } else {
+      list.hidden = true;
+      cals.hidden = false;
+      renderTBC();
+      render();
+    }
+    window.scrollTo(0, 0);
   }
 
   // ----- Navigation (synchronized: any arrow shifts all three) -----
@@ -656,7 +815,13 @@
 
   // ----- Events wiring (delegated) -----
   function wire() {
-    document.getElementById("todayBtn").addEventListener("click", goToday);
+    document.getElementById("todayBtn").addEventListener("click", function () {
+      if (view === "calendar") goToday(); else window.scrollTo(0, 0);
+    });
+    document.getElementById("viewToggle").addEventListener("click", function (e) {
+      var b = e.target.closest(".vt");
+      if (b) setView(b.getAttribute("data-view"));
+    });
 
     document.getElementById("cals").addEventListener("click", function (e) {
       var nav = e.target.closest("[data-nav]");
@@ -718,6 +883,7 @@
     // navigates months: down = next, up = previous. Portrait keeps normal page scroll.
     var wheelLock = 0;
     window.addEventListener("wheel", function (e) {
+      if (view !== "calendar") return;                         // list view → normal page scroll
       if (!singleMode()) return;                               // portrait → let the page scroll
       if (document.querySelector(".overlay.open")) return;     // picker is open → let it scroll
       if (dpOpen()) return;                                    // popover open → let its list scroll
@@ -736,8 +902,7 @@
   ref = { y: t.y, m: t.m };
   loadData().then(function (data) {
     normalize(data);
-    renderTBC();
-    render();
+    setView(view);   // renders the saved view (calendar default, or list)
   });
 })();
 </script>
