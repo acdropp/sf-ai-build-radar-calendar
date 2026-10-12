@@ -244,6 +244,39 @@
   .pill.dist { background: var(--amber-weak); color: var(--amber); }
   .pill.verify { background: var(--surface-3); color: var(--muted); border: 1px dashed var(--line-strong); }
 
+  /* Corner "+N ▲" affordance on crowded days */
+  .morepill {
+    position: absolute; right: 4px; bottom: 4px; z-index: 2;
+    display: inline-flex; align-items: center; gap: 4px;
+    font-family: var(--font-mono); font-size: 0.58rem; font-weight: 600; color: var(--accent);
+    background: var(--surface); border: 1px solid var(--line-strong); border-radius: 20px; padding: 1px 6px 1px 7px;
+    pointer-events: none; /* the whole cell is the click target */
+  }
+  .morepill .tri {
+    width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent;
+    border-bottom: 5px solid var(--accent);
+  }
+  .cell.crowded { padding-bottom: 14px; }
+
+  /* Anchored day popover */
+  .daypop {
+    position: fixed; z-index: 60; width: 300px; max-width: calc(100vw - 24px); max-height: 70vh;
+    background: var(--surface); border: 1px solid var(--line-strong); border-radius: 12px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.55); display: flex; flex-direction: column; overflow: hidden;
+  }
+  .daypop[hidden] { display: none; }
+  .dp-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 11px 12px 9px; border-bottom: 1px solid var(--line); flex: none; }
+  .dp-title { margin: 0; font-size: 0.82rem; font-weight: 700; }
+  .dp-close { background: none; border: none; color: var(--faint); font-size: 1.15rem; line-height: 1; cursor: pointer; padding: 0 2px; }
+  .dp-close:hover { color: var(--fg); }
+  .dp-list { overflow-y: auto; padding: 9px 10px; display: flex; flex-direction: column; gap: 7px; overscroll-behavior: contain; }
+  .dp-row { display: block; text-decoration: none; color: var(--fg); background: var(--surface-2); border: 1px solid var(--line); border-radius: 9px; padding: 8px 10px; }
+  .dp-row:hover, .dp-row.sel { border-color: var(--accent-line); background: var(--accent-weak); }
+  .dp-row .r-top { display: flex; align-items: baseline; gap: 8px; }
+  .dp-row .r-name { font-weight: 650; font-size: 0.85rem; }
+  .dp-row .r-meta { font-family: var(--font-mono); font-size: 0.66rem; color: var(--muted); margin-top: 3px; display: flex; flex-wrap: wrap; gap: 3px 9px; }
+  .dp-row .meter { margin-left: auto; }
+
   /* Legend */
   footer.legend { margin-top: 24px; padding-top: 14px; border-top: 1px solid var(--line); font-family: var(--font-mono); font-size: 0.68rem; color: var(--faint); display: flex; flex-wrap: wrap; gap: 6px 18px; }
   footer.legend .k { display: inline-flex; align-items: center; gap: 6px; }
@@ -302,16 +335,13 @@
   </div>
 </div>
 
-<!-- Day detail -->
-<div class="overlay" id="dayOverlay">
-  <div class="modal wide" role="dialog" aria-modal="true" aria-label="Events on this day">
-    <h3 id="dayTitle">Events</h3>
-    <div class="detail-day" id="dayDate"></div>
-    <div id="dayList"></div>
-    <div class="modal-actions">
-      <button class="mbtn" id="dayClose" type="button">Close</button>
-    </div>
+<!-- Day popover (anchored to the clicked day) -->
+<div class="daypop" id="dayPop" role="dialog" aria-label="Events on this day" hidden>
+  <div class="dp-head">
+    <h3 class="dp-title" id="dpTitle"></h3>
+    <button class="dp-close" id="dpClose" type="button" aria-label="Close">×</button>
   </div>
+  <div class="dp-list" id="dpList"></div>
 </div>
 
 <!-- Fallback data: used when ./data/events.json can't be fetched (e.g. opened as a local file://).
@@ -345,7 +375,8 @@
   var MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
   var MONTHS_SHORT = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   var DOW = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-  var CHIP_CAP = 3; // max event chips shown per day before "+N more"
+  var CHIP_CAP = 3; // max event chips shown per day before "+N more" (portrait/stacked)
+  var chipCap = CHIP_CAP; // active cap; landscape single-month fill uses fewer (set in render)
 
   // ----- State: one shared reference month drives all three calendars -----
   var ref = { y: 0, m: 0 };     // month shown in the FIRST calendar
@@ -420,11 +451,12 @@
     var key = dateKey(y, m, d);
     var evs = byDate[key] || [];
     var isToday = (t && y === t.y && m === t.m && d === t.d);
-    var cls = "cell" + (evs.length ? " has" : "") + (isToday ? " today" : "");
+    var crowded = evs.length > chipCap;
+    var cls = "cell" + (evs.length ? " has" : "") + (isToday ? " today" : "") + (crowded ? " crowded" : "");
     var html = '<div class="' + cls + '"' + (evs.length ? ' data-day="' + key + '"' : "") + '>';
     html += '<span class="dnum">' + d + "</span>";
 
-    var shown = evs.slice(0, CHIP_CAP);
+    var shown = evs.slice(0, chipCap);
     shown.forEach(function (ev) {
       var tier = scoreTier(ev);
       var nb = ev.status === "new" ? '<span class="nbadge">•</span>' : "";
@@ -433,8 +465,8 @@
       html += '<a class="ev s-' + tier + (ev.needsVerification ? " verify" : "") + '" href="' + esc(ev.url) + '" target="_blank" rel="noopener" title="' + esc(tip) + '">' +
         nb + esc(ev.name) + "</a>";
     });
-    if (evs.length > CHIP_CAP) {
-      html += '<button class="more" type="button" data-day="' + key + '">+' + (evs.length - CHIP_CAP) + " more</button>";
+    if (crowded) {
+      html += '<span class="morepill">+' + (evs.length - chipCap) + '<span class="tri"></span></span>';
     }
     html += "</div>";
     return html;
@@ -479,6 +511,7 @@
     var host = document.getElementById("cals");
     var count = singleMode() ? 1 : 3;
     host.classList.toggle("one", count === 1);
+    chipCap = (count === 1) ? 2 : CHIP_CAP;  // fewer chips per day in the height-constrained fill view
     var html = "";
     for (var i = 0; i < count; i++) {
       var mm = addMonths(ref.y, ref.m, i);
@@ -515,6 +548,7 @@
 
   // ----- Navigation (synchronized: any arrow shifts all three) -----
   function shift(delta) {
+    closeDayPop();
     var y = window.scrollY;
     ref = addMonths(ref.y, ref.m, delta);
     render();
@@ -522,6 +556,7 @@
   }
 
   function goToday() {
+    closeDayPop();
     var t = today();
     ref = { y: t.y, m: t.m };
     render();
@@ -546,38 +581,78 @@
     // the reference month is offset back by that panel's index.
     ref = addMonths(y, m, -pickerPanelIndex);
     closePicker();
+    closeDayPop();
     render();
     window.scrollTo(0, 0);
   }
 
-  // ----- Day detail -----
-  function openDay(key) {
+  // ----- Day popover: anchored to the clicked cell, fit-to-content with capped scroll -----
+  var dpSel = -1; // keyboard-selected row index
+
+  function openDayPop(key, rect) {
     var evs = byDate[key] || [];
     if (!evs.length) return;
     var parts = key.split("-");
     var y = +parts[0], m = +parts[1] - 1, d = +parts[2];
-    document.getElementById("dayTitle").textContent = evs.length + (evs.length === 1 ? " event" : " events");
-    document.getElementById("dayDate").textContent = DOW[new Date(y, m, d).getDay()] + ", " + MONTHS[m] + " " + d + ", " + y;
-    document.getElementById("dayList").innerHTML = evs.map(function (ev) {
+    document.getElementById("dpTitle").textContent =
+      DOW[new Date(y, m, d).getDay()] + ", " + MONTHS_SHORT[m] + " " + d + " · " +
+      evs.length + (evs.length === 1 ? " event" : " events");
+    var list = document.getElementById("dpList");
+    list.innerHTML = evs.map(function (ev, i) {
       var meter = "";
-      for (var i = 1; i <= 5; i++) meter += '<i class="' + (i <= (ev.score || 0) ? "on" : "") + '"></i>';
+      for (var k = 1; k <= 5; k++) meter += '<i class="' + (k <= (ev.score || 0) ? "on" : "") + '"></i>';
       var pills = "";
       if (ev.status === "new") pills += '<span class="pill new">new</span> ';
       if (ev.distanceNote) pills += '<span class="pill dist">' + esc(ev.distanceNote.split("—")[0].trim()) + "</span> ";
       if (ev.needsVerification) pills += '<span class="pill verify">verify</span> ';
       var time = ev.startTime ? (ev.startTime + (ev.endTime ? "–" + ev.endTime : "") + " " + (ev.tz || "PT")) : "";
       var loc = [ev.venue, ev.city].filter(Boolean).join(", ");
-      return '<a class="drow" href="' + esc(ev.url) + '" target="_blank" rel="noopener">' +
-        '<div class="dr-top"><span class="dr-name">' + esc(ev.name) + "</span>" +
+      return '<a class="dp-row" data-i="' + i + '" href="' + esc(ev.url) + '" target="_blank" rel="noopener">' +
+        '<div class="r-top"><span class="r-name">' + esc(ev.name) + "</span>" +
         '<span class="meter">' + meter + "</span></div>" +
-        '<div class="dr-meta"><span>' + esc(time) + "</span><span>" + esc(loc) + "</span>" +
+        '<div class="r-meta"><span>' + esc(time) + "</span><span>" + esc(loc) + "</span>" +
         (ev.price ? "<span>" + esc(ev.price) + "</span>" : "") + "</div>" +
-        (pills ? '<div class="dr-meta">' + pills + "</div>" : "") +
-        "</a>";
+        (pills ? '<div class="r-meta">' + pills + "</div>" : "") + "</a>";
     }).join("");
-    document.getElementById("dayOverlay").classList.add("open");
+    dpSel = -1;
+    list.scrollTop = 0;
+
+    // Measure, then place — fit to content (max-height caps it), flipping near edges.
+    var pop = document.getElementById("dayPop");
+    pop.hidden = false;
+    pop.style.visibility = "hidden";
+    pop.style.left = "0px";
+    pop.style.top = "0px";
+    var pr = pop.getBoundingClientRect();
+    var vw = window.innerWidth, vh = window.innerHeight, M = 12, G = 6, w = pr.width, h = pr.height;
+    var left = rect.left;
+    if (left + w > vw - M) left = rect.right - w;           // flip leftward near the right edge
+    left = Math.max(M, Math.min(left, vw - w - M));
+    var top = rect.bottom + G;
+    if (top + h > vh - M) {                                  // flip above near the bottom edge
+      var above = rect.top - G - h;
+      top = (above >= M) ? above : Math.max(M, vh - h - M);
+    }
+    pop.style.left = left + "px";
+    pop.style.top = top + "px";
+    pop.style.visibility = "visible";
   }
-  function closeDay() { document.getElementById("dayOverlay").classList.remove("open"); }
+  function closeDayPop() {
+    var p = document.getElementById("dayPop");
+    if (!p.hidden) { p.hidden = true; dpSel = -1; }
+  }
+  function dpOpen() { return !document.getElementById("dayPop").hidden; }
+  function dpMove(delta) {
+    var rows = document.querySelectorAll("#dpList .dp-row");
+    if (!rows.length) return;
+    dpSel = (dpSel + delta + rows.length) % rows.length;
+    rows.forEach(function (r, i) { r.classList.toggle("sel", i === dpSel); });
+    rows[dpSel].scrollIntoView({ block: "nearest" });
+  }
+  function dpEnter() {
+    var rows = document.querySelectorAll("#dpList .dp-row");
+    if (dpSel >= 0 && rows[dpSel]) window.open(rows[dpSel].href, "_blank", "noopener");
+  }
 
   // ----- Events wiring (delegated) -----
   function wire() {
@@ -588,28 +663,39 @@
       if (nav) { shift(nav.getAttribute("data-nav") === "prev" ? -1 : 1); return; }
       var pick = e.target.closest("[data-pick]");
       if (pick) { openPicker(parseInt(pick.getAttribute("data-pick"), 10)); return; }
-      var more = e.target.closest("button.more");
-      if (more) { openDay(more.getAttribute("data-day")); return; }
-      // clicking a day cell (not a chip link) opens the day detail
+      // clicking a day cell (not a chip link) opens its popover, anchored to the cell
       if (!e.target.closest("a.ev")) {
         var cell = e.target.closest(".cell.has");
-        if (cell) openDay(cell.getAttribute("data-day"));
+        if (cell) { openDayPop(cell.getAttribute("data-day"), cell.getBoundingClientRect()); }
       }
     });
 
     document.getElementById("pickCancel").addEventListener("click", closePicker);
     document.getElementById("pickConfirm").addEventListener("click", confirmPicker);
-    document.getElementById("dayClose").addEventListener("click", closeDay);
+    document.getElementById("dpClose").addEventListener("click", closeDayPop);
 
-    // overlay click-out + Esc
-    [["pickerOverlay", closePicker], ["dayOverlay", closeDay]].forEach(function (pair) {
-      document.getElementById(pair[0]).addEventListener("click", function (e) {
-        if (e.target === this) pair[1]();
-      });
+    // picker overlay click-out
+    document.getElementById("pickerOverlay").addEventListener("click", function (e) {
+      if (e.target === this) closePicker();
     });
+    // click outside the popover (and not on a day cell, which opens its own) closes it
+    document.addEventListener("click", function (e) {
+      if (dpOpen() && !e.target.closest("#dayPop") && !e.target.closest(".cell.has")) closeDayPop();
+    });
+    // the popover is anchored to a cell, so on scroll/resize just close it rather than chase the cell
+    window.addEventListener("scroll", closeDayPop, true);
+
     document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") { closePicker(); closeDay(); }
-      if (e.key === "Enter" && document.getElementById("pickerOverlay").classList.contains("open")) confirmPicker();
+      if (e.key === "Escape") { closePicker(); closeDayPop(); return; }
+      if (document.getElementById("pickerOverlay").classList.contains("open")) {
+        if (e.key === "Enter") confirmPicker();
+        return;
+      }
+      if (dpOpen()) {
+        if (e.key === "ArrowDown") { e.preventDefault(); dpMove(1); }
+        else if (e.key === "ArrowUp") { e.preventDefault(); dpMove(-1); }
+        else if (e.key === "Enter") { e.preventDefault(); dpEnter(); }
+      }
     });
 
     // populate month dropdown
@@ -619,6 +705,7 @@
     // re-render when orientation flips between stacked (portrait) and single-fill (landscape)
     var mode = singleMode();
     window.addEventListener("resize", function () {
+      closeDayPop(); // its anchor would be stale after a resize
       var m = singleMode();
       if (m !== mode) { mode = m; render(); }
     });
@@ -632,7 +719,8 @@
     var wheelLock = 0;
     window.addEventListener("wheel", function (e) {
       if (!singleMode()) return;                               // portrait → let the page scroll
-      if (document.querySelector(".overlay.open")) return;     // a modal is open → let it scroll
+      if (document.querySelector(".overlay.open")) return;     // picker is open → let it scroll
+      if (dpOpen()) return;                                    // popover open → let its list scroll
       e.preventDefault();
       if (Math.abs(e.deltaY) < 6) return;
       var now = Date.now();
