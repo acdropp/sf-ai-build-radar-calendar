@@ -144,6 +144,7 @@
   details.tbc[open] .tbc-items { margin-top: 10px; }
   .tbc .tbc-items { display: flex; flex-wrap: wrap; gap: 8px; }
   details.tbc:not([open]) .tbc-items { display: none; }  /* author display:flex would otherwise beat the UA closed-details rule */
+  details.tbc.squeezed { display: none !important; }     /* dropped in short landscape to keep the calendar readable */
   .tbc-chip {
     display: inline-flex; align-items: center; gap: 7px;
     background: var(--surface-2); border: 1px solid var(--line);
@@ -836,6 +837,20 @@
       sub += "  ·  data as of " + String(meta.generatedAt).slice(0, 10);
     }
     document.getElementById("sub").textContent = sub;
+    adjustTbc();
+  }
+
+  // Landscape single-month fill: keep the calendar readable. If showing the TBC
+  // shelf would squeeze the grid rows below a legible height, drop it from view.
+  function adjustTbc() {
+    var el = document.getElementById("tbcShelf");
+    if (!el) return;
+    if (!(view === "calendar" && singleMode()) || !tbc.length) { el.classList.remove("squeezed"); return; }
+    el.classList.remove("squeezed");                 // measure with it shown
+    var cell = document.querySelector(".cals.one .grid .cell:not(.blank)");
+    if (!cell) return;
+    var MINCELL = 74;                                // below this, day cells clip their chips
+    if (cell.getBoundingClientRect().height < MINCELL) el.classList.add("squeezed");
   }
 
   function renderTBC() {
@@ -1450,6 +1465,7 @@
       closeDayPop(); // its anchor would be stale after a resize
       var m = singleMode();
       if (m !== mode) { mode = m; render(); }
+      else adjustTbc();   // same orientation, different aspect: re-check TBC fit
     });
     var mq = window.matchMedia("(orientation: landscape)");
     if (mq.addEventListener) {
