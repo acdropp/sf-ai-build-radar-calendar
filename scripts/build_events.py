@@ -94,12 +94,18 @@ def main():
 
     # --- meta / new flags ---
     new_ids, last_run_label = [], None
+    summary, gaps, tracked = None, [], []
     if args.meta and os.path.exists(args.meta):
         try:
             md = json.load(open(args.meta, encoding="utf-8"))
             md = md.get("data", md)  # accept either the raw data object or a {data:...} envelope
             new_ids = md.get("newIds", []) or []
             last_run_label = md.get("lastRunLabel")
+            # Narrative / radar fields the site renders (what's-new, coverage gaps,
+            # tracked series). Passed straight through so the static site shows them.
+            summary = md.get("summary")
+            gaps = md.get("gaps", []) or []
+            tracked = md.get("tracked", []) or []
         except Exception as e:
             print(f"  ! could not read meta {args.meta}: {e}", file=sys.stderr)
 
@@ -127,6 +133,9 @@ def main():
             "eventCount": len(events),
             "newCount": sum(1 for e in events if e.get("status") == "new"),
             "datedCount": sum(1 for e in events if e.get("date")),
+            "summary": summary,
+            "gaps": gaps,
+            "tracked": tracked,
         },
         "events": events,
     }

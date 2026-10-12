@@ -5,7 +5,107 @@
     "source": "SF AI Build Radar digest (artifact DB)",
     "eventCount": 51,
     "newCount": 6,
-    "datedCount": 40
+    "datedCount": 40,
+    "summary": "6 new today: Claude for Games Build Day (Oct 12 — hands-on, build a playable game with Claude + demos), Fast Forward AI Hackathon (Oct 14 — one-day agents/multimodal/VR with mentors), Open Intelligence Summit by DigitalOcean (Oct 12–13 — open/portable-AI summit with a hands-on Day-0 workshop), Silicon Valley Physical AI Workshop (Oct 27, Menlo Park — OSS-vision twin of the SF Oct 28 session), Software Projects with AI at Hacker Dojo (Oct 20 — your gold-standard venue, now the Santa Clara location), and the Cline Open Source AI Hackathon at Frontier Tower (date TBC, members-only — direct open-source / own-your-AI angle). This week (Oct 12–18): TODAY Oct 12 'Build AI Agents That Own Their Inference' + the Open Intelligence Summit hands-on day (both 5/5); Oct 13 AWS Community Day – AI Edition (self-hosting LLMs, 4/5), EMBEDDED SF physical-AI hackathon, Foundry Live demo night and Personal AI Agents/Nanda — note the ComfyUI Build Night is flagged postponed on one listing, confirm before going; Oct 14 Wiki3 'Own Your Own AI' at Hacker Dojo (5/5), localhost SF and Fast Forward; Oct 16 Open Together: AI Builders Unite (5/5); Oct 17 ExecuTorch on-device hackathon (5/5) + Recursive Agents (4/5).",
+    "gaps": [
+      "ComfyUI Dev Platform Build Night (Oct 13) conflict persists: comfy.org still lists Oct 13 with no postponement notice, while the genai-sf Luma listing shows [POSTPONED]/Sold Out — unresolved; flagged needsVerification.",
+      "Recurring watch-series still have no next dated instance posted: Vibe Coding Nights / VCN (last confirmed VCN #41 was July 2026), Vibe Night Demos (#29 full), SF Demo Night (last was #16 in Feb), and Punk Software Hack Night (#9 was last). Cline Open Source AI Hackathon (Frontier Tower) added but date/details TBA (members-only).",
+      "Back half of the 90-day window (Nov 2026–Jan 2027) is still thin: most sources (Hacker Dojo & other Meetup iCals, Luma calendars, Cerebral Valley, Frontier Tower) list almost nothing past early November — organizers haven't posted dates yet.",
+      "AI Builders & Learners SF iCal returned only past events; AI Tinkerers SF still has no upcoming SF event posted (latest was a Sep 12 hackathon). Noisebridge has no AI/ML events in-window. Voxel51's other in-window sessions are online Zoom webinars (skipped).",
+      "createwith.com/sf fetch failed this run (CLIENT_ERROR) — Vibe Coding Nights covered indirectly via luma.com/vibe-code-nights (still showing a past edition) and web search (VCN #41 July 2026)."
+    ],
+    "tracked": [
+      {
+        "name": "Wiki3 · Own Your Own AI (Hacker Dojo)",
+        "url": "https://www.meetup.com/hackerdojo/events/ngrgbvyjcmbnc/",
+        "why": "Biweekly local-first / own-your-AI workshops — your gold standard. Oct 14 & Oct 28 confirmed via iCal; repeats ~Nov 11, Nov 25. Dojo now at Santa Clara."
+      },
+      {
+        "name": "Vibe Coding Nights",
+        "url": "https://luma.com/vibe-code-nights",
+        "why": "Local-models build nights at Frontier Tower; next dated edition still not posted (VCN #41 was July 2026)."
+      },
+      {
+        "name": "Vibe Night Demos",
+        "url": "https://luma.com/sfvibehouse",
+        "why": "House build+demo night; #29 is full — watching for the next edition."
+      },
+      {
+        "name": "Punk Software Hack Night (Imbue)",
+        "url": "https://luma.com/h18z7837",
+        "why": "Anti-lock-in open-agent biweekly; #9 was last — next instance not yet listed."
+      },
+      {
+        "name": "SF Demo Night",
+        "url": "https://luma.com/sfdn",
+        "why": "Recurring AI showcase at AWS Builder Loft; last was #16 (Feb) — next edition TBC."
+      },
+      {
+        "name": "Devnovate",
+        "url": "https://luma.com/devnovate",
+        "why": "Prolific free hackathons/buildathons/demo nights — Builder Base Buildathon Oct 30, HackwithBay 4.0 Nov 24, AI Demo Night Dec 4, Agentic AI Hackathon 2.0 Dec 15."
+      },
+      {
+        "name": "AWS Builder Loft",
+        "url": "https://luma.com/aws-builder-loft-events",
+        "why": "Frequent hands-on hackathons and workshops at 525 Market St."
+      },
+      {
+        "name": "Cerebral Valley",
+        "url": "https://cerebralvalley.ai/events",
+        "why": "Agent / open-model hackathons across SF and the Peninsula; Recursive Agents Oct 17, Intelligence at Work Oct 23."
+      },
+      {
+        "name": "Founders Inc (Fort Mason)",
+        "url": "https://luma.com/nighthack",
+        "why": "Night Hack build sprints; Oct 30 confirmed. Also hosts ExecuTorch Oct 17."
+      },
+      {
+        "name": "Frontier Tower",
+        "url": "https://luma.com/frontiertower",
+        "why": "Fine-tune/Nebius, Edge AI nights, Dell×NVIDIA & Cline open-source hackathons; many members-only."
+      },
+      {
+        "name": "Oakland Claude Code Enthusiasts",
+        "url": "https://www.meetup.com/claude-code-enthusiasts-evening-social-club/",
+        "why": "Near-daily hands-on coding-agent evenings (East Bay); next Oct 13/14/16/18/19/20/21/28."
+      },
+      {
+        "name": "Foundry Live / SF Conversational AI",
+        "url": "https://www.meetup.com/sf-conversational-ai/",
+        "why": "Monthly agentic-AI demo nights; Oct 13 confirmed."
+      },
+      {
+        "name": "ODSC AI SF",
+        "url": "https://www.meetup.com/san-francisco-odsc/events/",
+        "why": "Hands-on hackathons (Oct 28 Nebius) + ODSC AI West Oct 27–29 (Burlingame)."
+      },
+      {
+        "name": "Voxel51 / SF Frontier Tech",
+        "url": "https://www.meetup.com/san-francisco-frontier-tech-meetup/",
+        "why": "Hands-on OSS vision/robotics; SF Physical AI Oct 28 (in-person) + Silicon Valley Oct 27; rest online."
+      },
+      {
+        "name": "Hugging Face / Open Source AI Week",
+        "url": "https://luma.com/OpenTogether",
+        "why": "Open-weights community nights; Oct 16 Open Together + ExecuTorch Oct 17."
+      },
+      {
+        "name": "AI Tinkerers SF",
+        "url": "https://sf.aitinkerers.org/",
+        "why": "Monthly demo / science-fair nights; no upcoming SF date posted."
+      },
+      {
+        "name": "South Park Commons",
+        "url": "https://www.southparkcommons.com/events",
+        "why": "Mostly firesides/forums (talks) — Oct firesides on robotics & post-training; watch for any hands-on build night."
+      },
+      {
+        "name": "Hacker Dojo (general)",
+        "url": "https://www.meetup.com/hackerdojo/events/",
+        "why": "Software Projects with AI (Oct 20), Verilog/FPGA, study groups (South Bay, Santa Clara)."
+      }
+    ]
   },
   "events": [
     {

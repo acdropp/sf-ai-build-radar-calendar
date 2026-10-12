@@ -4,6 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>SF AI Build Radar — Calendar</title>
+<meta name="description" content="A daily-refreshed, taste-scored calendar of hands-on AI builder events in SF &amp; the Bay Area — hackathons, build nights, workshops and demo nights.">
+<!-- Social preview (Slack / iMessage / Discord / Twitter) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SF AI Build Radar">
+<meta property="og:title" content="SF AI Build Radar — Calendar">
+<meta property="og:description" content="A daily-refreshed, taste-scored calendar of hands-on AI builder events in SF &amp; the Bay Area — hackathons, build nights, workshops and demo nights.">
+<meta property="og:url" content="https://acdropp.github.io/sf-ai-build-radar-calendar/">
+<meta property="og:image" content="https://acdropp.github.io/sf-ai-build-radar-calendar/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="SF AI Build Radar — Calendar">
+<meta name="twitter:description" content="A daily-refreshed, taste-scored calendar of hands-on AI builder events in SF &amp; the Bay Area.">
+<meta name="twitter:image" content="https://acdropp.github.io/sf-ai-build-radar-calendar/og-image.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ctext y='20' font-size='20'%3E%E2%97%86%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap">
@@ -118,9 +133,17 @@
   }
   .tbc h2 {
     font-size: 0.7rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase;
-    color: var(--muted); margin: 0 0 8px;
+    color: var(--muted); margin: 0;
   }
+  details.tbc > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 9px; }
+  details.tbc > summary::-webkit-details-marker { display: none; }
+  details.tbc > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+  .tbc-count { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); background: var(--surface-2); border-radius: 20px; padding: 1px 9px; }
+  .tbc-chev { width: 15px; height: 15px; color: var(--faint); margin-left: auto; transition: transform 0.15s ease; flex: none; }
+  details.tbc[open] > summary .tbc-chev { transform: rotate(90deg); }
+  details.tbc[open] .tbc-items { margin-top: 10px; }
   .tbc .tbc-items { display: flex; flex-wrap: wrap; gap: 8px; }
+  details.tbc:not([open]) .tbc-items { display: none; }  /* author display:flex would otherwise beat the UA closed-details rule */
   .tbc-chip {
     display: inline-flex; align-items: center; gap: 7px;
     background: var(--surface-2); border: 1px solid var(--line);
@@ -402,6 +425,55 @@
   .sw.low { border-left-color: var(--line-strong); background: var(--surface-3); opacity: 0.5; }
 
   .empty-note { color: var(--faint); font-size: 0.85rem; padding: 20px; text-align: center; }
+
+  /* Stale-data banner */
+  .stale { margin: 14px 0 0; padding: 10px 14px; border-radius: 10px; font-size: 0.82rem;
+    background: var(--amber-weak); color: var(--amber); border: 1px solid transparent; display: flex; gap: 8px; align-items: baseline; }
+  .stale[hidden] { display: none; }
+  .stale b { font-weight: 700; }
+
+  /* Secondary actions in the expanded list detail (add-to-calendar) */
+  .l-btn.ghost { background: transparent; color: var(--accent); border: 1px solid var(--accent-line); }
+  .l-btn.ghost:hover { background: var(--accent-weak); }
+
+  /* What's-new highlight + coverage/tracked panels (list view) */
+  .lsec.whatsnew .lsec-head h2 { color: var(--accent); }
+  .lpanel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+  .lpanel.gaps { border-left: 3px solid var(--amber); }
+  .lpanel ul { margin: 0; padding-left: 18px; }
+  .lpanel li { font-size: 0.84rem; margin-bottom: 7px; color: var(--muted); }
+  .lpanel li:last-child { margin-bottom: 0; }
+  .trackgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px; }
+  .track { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+  .track .t-name { font-weight: 650; font-size: 0.85rem; }
+  .track .t-why { color: var(--muted); font-size: 0.76rem; margin-top: 3px; line-height: 1.4; }
+  .track a { color: var(--accent); text-decoration: none; font-family: var(--font-mono); font-size: 0.7rem; display: inline-block; margin-top: 6px; word-break: break-all; }
+
+  /* Mobile list refinements */
+  @media (max-width: 560px) {
+    .wrap { }
+    details.lrow summary { padding: 10px 12px; column-gap: 9px; }
+    .l-name { font-size: 0.9rem; }
+    .l-detail { padding: 2px 12px 14px; }
+    .l-detail dl { grid-template-columns: 1fr; gap: 1px 0; }
+    .l-detail dt { padding-top: 8px; }
+    .l-detail dt:first-child { padding-top: 0; }
+    .trackgrid { grid-template-columns: 1fr; }
+  }
+
+  /* Print: a clean, expanded weekly handout */
+  @media print {
+    header.app, .viewtoggle, .btn-today, .icon-btn, .l-chev, .l-actions, .stale,
+    .nav, .cal-head .cal-title, .daypop, .overlay, footer.legend { display: none !important; }
+    body, .wrap { background: #fff; color: #000; }
+    .wrap { max-width: 100%; height: auto; overflow: visible; padding: 0; }
+    details.lrow { break-inside: avoid; border: 1px solid #ccc !important; box-shadow: none !important; }
+    details.lrow .l-detail { display: block !important; border-top: 1px solid #ddd; }
+    details.lrow summary { pointer-events: none; }
+    .lpanel, .track { border: 1px solid #ccc !important; break-inside: avoid; }
+    .cals { display: none !important; }        /* print the list, not the grid */
+    .listview { display: flex !important; }
+  }
 </style>
 </head>
 <body>
@@ -426,13 +498,19 @@
     </div>
   </header>
 
+  <div class="stale" id="staleBanner" role="status" hidden></div>
+
   <main class="cals" id="cals" aria-live="polite"></main>
   <main class="listview" id="listView" aria-live="polite" hidden></main>
 
-  <section class="tbc" id="tbcShelf" hidden>
-    <h2>No date yet · to be confirmed</h2>
+  <details class="tbc" id="tbcShelf" hidden>
+    <summary>
+      <h2>No date yet · to be confirmed</h2>
+      <span class="tbc-count" id="tbcCount"></span>
+      <svg class="tbc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+    </summary>
     <div class="tbc-items" id="tbcItems"></div>
-  </section>
+  </details>
 
   <footer class="legend">
     <span class="k"><span class="sw high"></span> strong fit (4–5)</span>
@@ -678,6 +756,7 @@
     var host = document.getElementById("tbcItems");
     if (!tbc.length) { shelf.hidden = true; return; }
     shelf.hidden = false;
+    document.getElementById("tbcCount").textContent = tbc.length;
     host.innerHTML = tbc.map(function (ev) {
       var when = ev.dateDisplay || "TBC";
       return '<a class="tbc-chip" href="' + esc(ev.url) + '" target="_blank" rel="noopener">' +
@@ -758,6 +837,91 @@
       '<span class="num">' + score + "/5</span>";
   }
 
+  // ----- Add to calendar: .ics data-URI (with VTIMEZONE) + Google Calendar link -----
+  function pad2(n) { return (n < 10 ? "0" : "") + n; }
+  function parse12h(t) {                 // "9:00 AM" -> {h,m} 24h, or null
+    if (!t) return null;
+    var m = String(t).trim().match(/^(\d{1,2}):(\d{2})\s*([AaPp][Mm])?/);
+    if (!m) return null;
+    var h = +m[1], mn = +m[2], ap = (m[3] || "").toUpperCase();
+    if (ap === "PM" && h < 12) h += 12;
+    if (ap === "AM" && h === 12) h = 0;
+    return { h: h, m: mn };
+  }
+  function stamp(iso, hm) { var p = iso.split("-"); return p[0] + p[1] + p[2] + "T" + pad2(hm.h) + pad2(hm.m) + "00"; }
+  function dateCompact(iso) { var p = iso.split("-"); return p[0] + p[1] + p[2]; }
+  function icsEscape(s) {
+    return String(s == null ? "" : s).replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
+  }
+  function calWindow(ev) {                // {allDay,start,end} in local wall time, or null
+    if (!ev.date) return null;
+    var st = parse12h(ev.startTime), en = parse12h(ev.endTime);
+    if (!st) return { allDay: true, start: dateCompact(ev.date), end: dateCompact(addDaysISO(ev.date, 1)) };
+    var endIso = ev.date, endHm = en;
+    if (en) {
+      if (en.h * 60 + en.m <= st.h * 60 + st.m) endIso = addDaysISO(ev.date, 1); // overnight
+    } else {
+      endHm = { h: (st.h + 1) % 24, m: st.m };                                   // default 1h
+      if (st.h === 23) endIso = addDaysISO(ev.date, 1);
+    }
+    return { allDay: false, start: stamp(ev.date, st), end: stamp(endIso, endHm) };
+  }
+  var VTZ =
+    "BEGIN:VTIMEZONE\r\nTZID:America/Los_Angeles\r\n" +
+    "BEGIN:DAYLIGHT\r\nTZOFFSETFROM:-0800\r\nTZOFFSETTO:-0700\r\nTZNAME:PDT\r\nDTSTART:19700308T020000\r\nRRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU\r\nEND:DAYLIGHT\r\n" +
+    "BEGIN:STANDARD\r\nTZOFFSETFROM:-0700\r\nTZOFFSETTO:-0800\r\nTZNAME:PST\r\nDTSTART:19701101T020000\r\nRRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU\r\nEND:STANDARD\r\n" +
+    "END:VTIMEZONE\r\n";
+  function icsText(ev) {
+    var w = calWindow(ev); if (!w) return null;
+    var loc = [ev.venue, ev.address, ev.city].filter(Boolean).join(", ");
+    var desc = [];
+    if (ev.fit) desc.push("Why it fits: " + ev.fit);
+    if (ev.url) desc.push(ev.url);
+    if (ev.source) desc.push("Source: " + ev.source);
+    var dt = w.allDay
+      ? "DTSTART;VALUE=DATE:" + w.start + "\r\nDTEND;VALUE=DATE:" + w.end
+      : "DTSTART;TZID=America/Los_Angeles:" + w.start + "\r\nDTEND;TZID=America/Los_Angeles:" + w.end;
+    var uid = String(ev.id || ev.name).replace(/[^a-z0-9]+/gi, "-") + "@sf-ai-build-radar";
+    var n = new Date();
+    var dtstamp = n.getUTCFullYear() + pad2(n.getUTCMonth() + 1) + pad2(n.getUTCDate()) + "T" +
+      pad2(n.getUTCHours()) + pad2(n.getUTCMinutes()) + pad2(n.getUTCSeconds()) + "Z";
+    return "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//SF AI Build Radar//EN\r\nCALSCALE:GREGORIAN\r\nMETHOD:PUBLISH\r\n" +
+      (w.allDay ? "" : VTZ) +
+      "BEGIN:VEVENT\r\nUID:" + uid + "\r\nDTSTAMP:" + dtstamp + "\r\n" + dt + "\r\n" +
+      "SUMMARY:" + icsEscape(ev.name) + "\r\n" +
+      (loc ? "LOCATION:" + icsEscape(loc) + "\r\n" : "") +
+      (desc.length ? "DESCRIPTION:" + icsEscape(desc.join("\n")) + "\r\n" : "") +
+      (ev.url ? "URL:" + icsEscape(ev.url) + "\r\n" : "") +
+      "END:VEVENT\r\nEND:VCALENDAR\r\n";
+  }
+  function icsHref(ev) { var t = icsText(ev); return t ? "data:text/calendar;charset=utf-8," + encodeURIComponent(t) : null; }
+  function gcalHref(ev) {
+    var w = calWindow(ev); if (!w) return null;
+    var loc = [ev.venue, ev.address, ev.city].filter(Boolean).join(", ");
+    var details = []; if (ev.fit) details.push(ev.fit); if (ev.url) details.push(ev.url);
+    return "https://calendar.google.com/calendar/render?action=TEMPLATE" +
+      "&text=" + encodeURIComponent(ev.name) +
+      "&dates=" + w.start + "/" + w.end +
+      "&ctz=America/Los_Angeles" +
+      (loc ? "&location=" + encodeURIComponent(loc) : "") +
+      (details.length ? "&details=" + encodeURIComponent(details.join("\n\n")) : "");
+  }
+
+  // ----- Stale-data banner: warn if the last sync is more than ~36h old -----
+  function renderStale() {
+    var el = document.getElementById("staleBanner");
+    if (!el) return;
+    var gen = meta && meta.generatedAt ? new Date(meta.generatedAt) : null;
+    if (!gen || isNaN(gen.getTime())) { el.hidden = true; return; }
+    var hrs = (Date.now() - gen.getTime()) / 36e5;
+    if (hrs <= 36) { el.hidden = true; return; }
+    var ago = hrs >= 48 ? (Math.floor(hrs / 24) + " days") : (Math.floor(hrs) + " hours");
+    el.innerHTML = '<span><b>⚠ Data may be stale.</b> Last sync was ' + esc(ago) + ' ago (' +
+      esc(meta.lastRunLabel || String(meta.generatedAt).slice(0, 10)) +
+      '). The daily refresh may have stopped — check before relying on this.</span>';
+    el.hidden = false;
+  }
+
   var CHEV = '<svg class="l-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
 
   function lrow(ev, isPast) {
@@ -822,17 +986,40 @@
         (themes ? '<ul class="l-themes">' + themes + "</ul>" : "") +
         (ev.fit ? '<div class="l-fit"><b>Why it fits you</b>' + esc(ev.fit) + "</div>" : "") +
         '<div class="l-actions"><a class="l-btn" href="' + esc(url) + '" target="_blank" rel="noopener">Open event ↗</a>' +
+          (ev.date && icsHref(ev) ? '<a class="l-btn ghost" href="' + icsHref(ev) + '" download="' + esc(String(ev.id || "event")) + '.ics">Add to calendar</a>' : "") +
+          (ev.date && gcalHref(ev) ? '<a class="l-btn ghost" href="' + esc(gcalHref(ev)) + '" target="_blank" rel="noopener">Google Calendar</a>' : "") +
           (urlShort ? '<span class="src">' + urlShort + "</span>" : "") +
         "</div>" +
       "</div>" +
     "</details>";
   }
-  function lsection(title, hint, rows) {
+  function lsection(title, hint, rows, cls) {
     if (!rows.length) return "";
-    return '<section class="lsec"><div class="lsec-head"><h2>' + esc(title) + "</h2>" +
+    return '<section class="lsec' + (cls ? " " + cls : "") + '"><div class="lsec-head"><h2>' + esc(title) + "</h2>" +
       '<span class="count">' + rows.length + '</span><span class="rule"></span></div>' +
       (hint ? '<p class="lsec-hint">' + esc(hint) + "</p>" : "") +
       '<div class="lrows">' + rows.join("") + "</div></section>";
+  }
+  // Coverage-gaps + tracked-series panels, straight from the digest's meta/run.
+  function gapsPanel() {
+    if (!meta || !meta.gaps || !meta.gaps.length) return "";
+    return '<section class="lsec"><div class="lsec-head"><h2>Coverage gaps this run</h2>' +
+      '<span class="count">' + meta.gaps.length + '</span><span class="rule"></span></div>' +
+      '<p class="lsec-hint">What the radar knows is thin or unconfirmed — so you also see what it is <em>not</em> showing.</p>' +
+      '<div class="lpanel gaps"><ul>' + meta.gaps.map(function (g) { return "<li>" + esc(g) + "</li>"; }).join("") + "</ul></div></section>";
+  }
+  function trackedPanel() {
+    if (!meta || !meta.tracked || !meta.tracked.length) return "";
+    var cards = meta.tracked.map(function (tr) {
+      return '<div class="track"><div class="t-name">' + esc(tr.name) + "</div>" +
+        (tr.why ? '<div class="t-why">' + esc(tr.why) + "</div>" : "") +
+        (tr.url ? '<a href="' + esc(tr.url) + '" target="_blank" rel="noopener">' + esc(tr.url.replace(/^https?:\/\//, "")) + " ↗</a>" : "") +
+        "</div>";
+    }).join("");
+    return '<section class="lsec"><div class="lsec-head"><h2>Recurring series on watch</h2>' +
+      '<span class="count">' + meta.tracked.length + '</span><span class="rule"></span></div>' +
+      '<p class="lsec-hint">Backbone communities the daily refresh checks for each new instance.</p>' +
+      '<div class="trackgrid">' + cards + "</div></section>";
   }
   function renderList() {
     var t = today(), tk = dateKey(t.y, t.m, t.d), weekEnd = addDaysISO(tk, 6);
@@ -848,11 +1035,15 @@
     var byScore = function (a, b) { return (b.score || 0) - (a.score || 0); };
     thisWeek.sort(asc); upcoming.sort(asc); past.sort(desc);
     var tbcSorted = tbc.slice().sort(byScore);
+    var newItems = allEvents.filter(function (e) { return e.status === "new" && e.date && e.date >= tk; }).sort(asc);
+    var newHint = (meta && meta.summary) ? meta.summary : "The newest finds from today's refresh.";
     var html =
+      lsection("What's new since last run", newHint, newItems.map(function (e) { return lrow(e, false); }), "whatsnew") +
       lsection("This week", "Dated events in the next 7 days. Tap a row to expand.", thisWeek.map(function (e) { return lrow(e, false); })) +
       lsection("Upcoming", "Soonest first; within a day, higher-scored first.", upcoming.map(function (e) { return lrow(e, false); })) +
       lsection("To be confirmed", "Real finds with a date or time still to pin down.", tbcSorted.map(function (e) { return lrow(e, false); })) +
-      lsection("Past", null, past.map(function (e) { return lrow(e, true); }));
+      lsection("Past", null, past.map(function (e) { return lrow(e, true); })) +
+      gapsPanel() + trackedPanel();
     document.getElementById("listView").innerHTML = html || '<div class="empty-note">No events.</div>';
 
     var sub = allEvents.length + (allEvents.length === 1 ? " event" : " events");
@@ -1012,6 +1203,14 @@
       if (b) setView(b.getAttribute("data-view"));
     });
 
+    // TBC shelf remembers whether it's collapsed (default: expanded)
+    var TBC_KEY = "radar-tbc-open";
+    var tbcEl = document.getElementById("tbcShelf");
+    try { tbcEl.open = localStorage.getItem(TBC_KEY) !== "0"; } catch (e) { tbcEl.open = true; }
+    tbcEl.addEventListener("toggle", function () {
+      try { localStorage.setItem(TBC_KEY, tbcEl.open ? "1" : "0"); } catch (e) {}
+    });
+
     document.getElementById("cals").addEventListener("click", function (e) {
       var nav = e.target.closest("[data-nav]");
       if (nav) { shift(nav.getAttribute("data-nav") === "prev" ? -1 : 1); return; }
@@ -1091,6 +1290,7 @@
   ref = { y: t.y, m: t.m };
   loadData().then(function (data) {
     normalize(data);
+    renderStale();
     setView(view);   // renders the saved view (calendar default, or list)
   });
 })();
