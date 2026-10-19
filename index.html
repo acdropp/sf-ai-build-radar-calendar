@@ -542,7 +542,6 @@
     <div class="headrow">
       <div>
         <h1><span class="spark">◆</span> SF AI Build Radar</h1>
-        <div class="sub" id="sub">loading…</div>
       </div>
       <div class="head-right">
         <button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light and dark theme" title="Toggle theme">
@@ -909,7 +908,7 @@
     if (meta && meta.generatedAt) {
       sub += "  ·  data as of " + String(meta.generatedAt).slice(0, 10);
     }
-    document.getElementById("sub").textContent = sub;
+    var _s = document.getElementById("sub"); if (_s) _s.textContent = sub;
     adjustTbc();
   }
 
@@ -941,7 +940,7 @@
 
     var sub = (calMode === "2week" ? "2 weeks" : "1 week") + " · " + MONTHS[sp.m] + " " + sp.y;
     if (meta && meta.generatedAt) sub += "  ·  data as of " + String(meta.generatedAt).slice(0, 10);
-    document.getElementById("sub").textContent = sub;
+    var _s = document.getElementById("sub"); if (_s) _s.textContent = sub;
     adjustTbc();
   }
 
@@ -1298,7 +1297,7 @@
     if (meta && (meta.lastRunLabel || meta.generatedAt)) {
       sub += "  ·  updated " + (meta.lastRunLabel || String(meta.generatedAt).slice(0, 10));
     }
-    document.getElementById("sub").textContent = sub;
+    var _s = document.getElementById("sub"); if (_s) _s.textContent = sub;
   }
 
   // ----- Filters: apply to both views, reflect in the chips, mirror to the URL -----
