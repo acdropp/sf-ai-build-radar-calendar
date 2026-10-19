@@ -205,9 +205,10 @@
     padding: 14px 14px 16px;
     display: flex; flex-direction: column;
   }
-  .cal-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+  .cal-head { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .cal-head .nav[data-nav="next"] { margin-left: auto; }
   .cal-title {
-    font-weight: 700; font-size: 1rem; letter-spacing: -0.01em;
+    font-weight: 700; font-size: 1rem; letter-spacing: -0.01em; white-space: nowrap;
     background: none; border: none; color: var(--fg); cursor: pointer;
     padding: 5px 9px; border-radius: 8px; font-family: var(--font-body);
   }
@@ -222,6 +223,25 @@
   }
   .nav:hover { background: var(--surface-3); color: var(--fg); }
   .nav:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  /* Range dropdown (Month / 2 weeks / 1 week), in the calendar header row */
+  .modemenu {
+    font: inherit; font-size: 0.82rem; font-weight: 600; color: var(--fg); width: auto;
+    background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px;
+    padding: 5px 26px 5px 11px; cursor: pointer; flex: none; appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239aa3b2' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 8px center; background-size: 12px;
+  }
+  .modemenu:hover { background-color: var(--surface-3); border-color: var(--line-strong); }
+  .modemenu:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  /* Static range title (week / 2-week modes) — matches the month title, no button affordances */
+  .cal-title-static { font-weight: 700; font-size: 1rem; letter-spacing: -0.01em; color: var(--fg); padding: 5px 2px; white-space: nowrap; }
+  .cals.one .cal-title-static { font-size: 1.2rem; }
+
+  /* Week / 2-week mode: taller day rows in portrait (landscape reuses the single-fill rules) */
+  @media (orientation: portrait) {
+    .cals.weekmode .grid { grid-auto-rows: minmax(150px, auto); }
+  }
 
   .dow { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin-bottom: 4px; }
   .dow span {
@@ -505,7 +525,7 @@
   /* Print: a clean, expanded weekly handout */
   @media print {
     header.app, .viewtoggle, .btn-today, .icon-btn, .l-chev, .l-actions, .stale, .filterbar,
-    .nav, .cal-head .cal-title, .daypop, .overlay, footer.legend { display: none !important; }
+    .nav, .cal-head .cal-title, .modemenu, .daypop, .overlay, footer.legend { display: none !important; }
     body, .wrap { background: #fff; color: #000; }
     .wrap { max-width: 100%; height: auto; overflow: visible; padding: 0; }
     details.lrow { break-inside: avoid; border: 1px solid #ccc !important; box-shadow: none !important; }
@@ -677,6 +697,12 @@
   try { view = localStorage.getItem(VIEW_KEY) || "calendar"; } catch (e) {}
   if (view !== "list") view = "calendar";
 
+  // Calendar range mode: month (adaptive 1/3 months) | week (1 week) | 2week (2 weeks)
+  var CALMODE_KEY = "radar-calmode";
+  var calMode = "month";
+  try { var _cm = localStorage.getItem(CALMODE_KEY); if (_cm === "week" || _cm === "2week") calMode = _cm; } catch (e) {}
+  var weekStart = null;         // ISO date (Sunday) anchoring week/2-week modes
+
   // ----- Pure date helpers -----
   function pad(n) { return (n < 10 ? "0" : "") + n; }
   function dateKey(y, m, d) { return y + "-" + pad(m + 1) + "-" + pad(d); }
@@ -695,6 +721,18 @@
   function today() {
     var d = new Date();
     return { y: d.getFullYear(), m: d.getMonth(), d: d.getDate() };
+  }
+  function todayISO() { var t = today(); return dateKey(t.y, t.m, t.d); }
+  function isoParts(iso) { var p = iso.split("-"); return { y: +p[0], m: +p[1] - 1, d: +p[2] }; }
+  function sundayOf(iso) {                      // start (Sun) of the week containing iso
+    var p = iso.split("-"), d = new Date(+p[0], +p[1] - 1, +p[2]);
+    d.setDate(d.getDate() - d.getDay());
+    return dateKey(d.getFullYear(), d.getMonth(), d.getDate());
+  }
+  function rangeLabel(a, b) {                   // a,b = {y,m,d} inclusive span
+    if (a.y === b.y && a.m === b.m) return MONTHS_SHORT[a.m] + " " + a.d + "–" + b.d + ", " + a.y;
+    if (a.y === b.y) return MONTHS_SHORT[a.m] + " " + a.d + " – " + MONTHS_SHORT[b.m] + " " + b.d + ", " + a.y;
+    return MONTHS_SHORT[a.m] + " " + a.d + ", " + a.y + " – " + MONTHS_SHORT[b.m] + " " + b.d + ", " + b.y;
   }
 
   function scoreTier(ev) {
@@ -808,6 +846,15 @@
     return html;
   }
 
+  // The range dropdown; rendered once (in the first/only calendar's header row).
+  function buildModeMenu() {
+    return '<select class="modemenu" id="modeMenu" aria-label="Calendar range">' +
+      '<option value="month"' + (calMode === "month" ? " selected" : "") + ">Month</option>" +
+      '<option value="2week"' + (calMode === "2week" ? " selected" : "") + ">2 weeks</option>" +
+      '<option value="week"' + (calMode === "week" ? " selected" : "") + ">1 week</option>" +
+      "</select>";
+  }
+
   function buildCalendar(y, m, panelIndex, t) {
     var fw = firstWeekday(y, m);
     var dim = daysInMonth(y, m);
@@ -819,6 +866,7 @@
     html += '<button class="nav" type="button" data-nav="prev" aria-label="Previous month">‹</button>';
     html += '<button class="cal-title" type="button" data-pick="' + panelIndex + '">' +
       MONTHS[m] + ' <span class="yr">' + y + "</span></button>";
+    if (panelIndex === 0) html += buildModeMenu();
     html += '<button class="nav" type="button" data-nav="next" aria-label="Next month">›</button>';
     html += "</div>";
 
@@ -843,10 +891,11 @@
   }
 
   function render() {
+    if (calMode === "week" || calMode === "2week") { renderWeeks(); return; }
     var t = today();
     var host = document.getElementById("cals");
     var count = singleMode() ? 1 : 3;
-    host.classList.toggle("one", count === 1);
+    host.className = "cals" + (count === 1 ? " one" : "");
     chipCap = (count === 1) ? 2 : CHIP_CAP;  // fewer chips per day in the height-constrained fill view
     var html = "";
     for (var i = 0; i < count; i++) {
@@ -868,6 +917,56 @@
     }
     document.getElementById("sub").textContent = sub;
     adjustTbc();
+  }
+
+  // Week / 2-week mode: one grid of 7 or 14 consecutive days, anchored at weekStart.
+  function renderWeeks() {
+    var t = today();
+    var host = document.getElementById("cals");
+    var nDays = (calMode === "2week" ? 14 : 7);
+    host.className = "cals one weekmode";
+    chipCap = (calMode === "2week" ? 6 : 8);   // tall cells → show more before "+N"
+    if (!weekStart) weekStart = sundayOf(todayISO());
+    var sp = isoParts(weekStart), ep = isoParts(addDaysISO(weekStart, nDays - 1));
+    var title = rangeLabel(sp, ep);
+
+    var html = '<section class="cal weekcal">';
+    html += '<div class="cal-head">';
+    html += '<button class="nav" type="button" data-nav="prev" aria-label="Previous">‹</button>';
+    html += '<span class="cal-title-static">' + esc(title) + "</span>";
+    html += buildModeMenu();
+    html += '<button class="nav" type="button" data-nav="next" aria-label="Next">›</button>';
+    html += "</div>";
+    html += '<div class="dow">' + DOW.map(function (d) { return "<span>" + d + "</span>"; }).join("") + "</div>";
+    html += '<div class="grid">';
+    for (var i = 0; i < nDays; i++) {
+      var p = isoParts(addDaysISO(weekStart, i));
+      html += buildCell(p.y, p.m, p.d, t);
+    }
+    html += "</div></section>";
+    host.innerHTML = html;
+
+    var sub = (calMode === "2week" ? "2 weeks · " : "This week · ") + title;
+    if (meta && meta.generatedAt) sub += "  ·  data as of " + String(meta.generatedAt).slice(0, 10);
+    document.getElementById("sub").textContent = sub;
+    adjustTbc();
+  }
+
+  function setCalMode(m) {
+    if (m !== "week" && m !== "2week") m = "month";
+    calMode = m;
+    try { localStorage.setItem(CALMODE_KEY, m); } catch (e) {}
+    if (m === "week" || m === "2week") {
+      weekStart = sundayOf(todayISO());          // show the week today is part of
+    } else if (weekStart) {
+      var p = isoParts(weekStart); ref = { y: p.y, m: p.m };   // month of where we were
+    } else {
+      var t = today(); ref = { y: t.y, m: t.m };
+    }
+    closeDayPop();
+    render();
+    writeURL();
+    window.scrollTo(0, 0);
   }
 
   // In landscape single-month calendar view the TBC bar isn't useful and eats space,
@@ -1244,6 +1343,9 @@
     var q;
     try { q = new URLSearchParams(location.search); } catch (e) { return; }
     var v = q.get("v"); if (v === "list" || v === "calendar") view = v;
+    var cm = q.get("cal"); if (cm === "week" || cm === "2week" || cm === "month") calMode = cm;
+    var w = q.get("w");
+    if (w && /^\d{4}-\d{2}-\d{2}$/.test(w)) { weekStart = sundayOf(w); urlRefSet = true; }
     var m = q.get("m");
     if (m && /^\d{4}-\d{1,2}$/.test(m)) {
       var pp = m.split("-"), yy = +pp[0], mm = +pp[1] - 1;
@@ -1262,7 +1364,10 @@
   function writeURL() {
     var q = new URLSearchParams();
     q.set("v", view);
-    if (view === "calendar") q.set("m", ref.y + "-" + pad(ref.m + 1));
+    if (view === "calendar") {
+      if (calMode === "week" || calMode === "2week") { q.set("cal", calMode); if (weekStart) q.set("w", weekStart); }
+      else q.set("m", ref.y + "-" + pad(ref.m + 1));
+    }
     if (filters.q) q.set("q", filters.q);
     if (filters.minScore) q.set("s", "4");
     if (filters.sources) q.set("src", filters.sources.map(function (s) { return SRC_REV[s]; }).join(","));
@@ -1301,7 +1406,9 @@
   function shift(delta) {
     closeDayPop();
     var y = window.scrollY;
-    ref = addMonths(ref.y, ref.m, delta);
+    if (calMode === "week") weekStart = addDaysISO(weekStart, delta * 7);
+    else if (calMode === "2week") weekStart = addDaysISO(weekStart, delta * 14);
+    else ref = addMonths(ref.y, ref.m, delta);
     render();
     writeURL();
     window.scrollTo(0, y); // preserve scroll position on navigation
@@ -1310,7 +1417,8 @@
   function goToday() {
     closeDayPop();
     var t = today();
-    ref = { y: t.y, m: t.m };
+    if (calMode === "week" || calMode === "2week") weekStart = sundayOf(todayISO());
+    else ref = { y: t.y, m: t.m };
     render();
     writeURL();
     window.scrollTo(0, 0);
@@ -1476,6 +1584,12 @@
       }, 180);
     });
 
+    // Range dropdown (delegated — the select is re-rendered on each render)
+    document.getElementById("cals").addEventListener("change", function (e) {
+      var mm = e.target.closest("#modeMenu");
+      if (mm) setCalMode(mm.value);
+    });
+
     document.getElementById("cals").addEventListener("click", function (e) {
       var nav = e.target.closest("[data-nav]");
       if (nav) { shift(nav.getAttribute("data-nav") === "prev" ? -1 : 1); return; }
@@ -1559,9 +1673,10 @@
 
   // ----- Boot -----
   wire();
-  readURL();                      // deep-link params set view / month / filters
+  readURL();                      // deep-link params set view / range / month / filters
   var t = today();
   if (!urlRefSet) ref = { y: t.y, m: t.m };
+  if ((calMode === "week" || calMode === "2week") && !weekStart) weekStart = sundayOf(todayISO());
   loadData().then(function (data) {
     normalize(data);              // rebuild() applies the filters from the URL
     renderStale();
