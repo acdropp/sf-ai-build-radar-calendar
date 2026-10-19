@@ -870,17 +870,13 @@
     adjustTbc();
   }
 
-  // Landscape single-month fill: keep the calendar readable. If showing the TBC
-  // shelf would squeeze the grid rows below a legible height, drop it from view.
+  // In landscape single-month calendar view the TBC bar isn't useful and eats space,
+  // so hide it there entirely. It stays in portrait (scroll to the bottom of the
+  // stacked months to see it).
   function adjustTbc() {
     var el = document.getElementById("tbcShelf");
     if (!el) return;
-    if (!(view === "calendar" && singleMode()) || !tbc.length) { el.classList.remove("squeezed"); return; }
-    el.classList.remove("squeezed");                 // measure with it shown
-    var cell = document.querySelector(".cals.one .grid .cell:not(.blank)");
-    if (!cell) return;
-    var MINCELL = 74;                                // below this, day cells clip their chips
-    if (cell.getBoundingClientRect().height < MINCELL) el.classList.add("squeezed");
+    el.classList.toggle("squeezed", view === "calendar" && singleMode());
   }
 
   function renderTBC() {
