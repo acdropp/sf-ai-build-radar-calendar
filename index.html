@@ -205,8 +205,7 @@
     padding: 14px 14px 16px;
     display: flex; flex-direction: column;
   }
-  .cal-head { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
-  .cal-head .nav[data-nav="next"] { margin-left: auto; }
+  .cal-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
   .cal-title {
     font-weight: 700; font-size: 1rem; letter-spacing: -0.01em; white-space: nowrap;
     background: none; border: none; color: var(--fg); cursor: pointer;
@@ -214,7 +213,7 @@
   }
   .cal-title:hover { background: var(--surface-2); }
   .cal-title:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-  .cal-title .yr { color: var(--faint); font-weight: 500; }
+  .cal-title .yr, .cal-title-static .yr { color: var(--faint); font-weight: 500; }
   .nav {
     background: var(--surface-2); border: 1px solid var(--line);
     color: var(--muted); width: 30px; height: 30px; border-radius: 8px; cursor: pointer;
@@ -555,6 +554,11 @@
           <button class="vt" data-view="list" role="tab" aria-selected="false" type="button">List</button>
         </div>
         <button class="btn-today" id="todayBtn" type="button">Today</button>
+        <select class="modemenu" id="modeMenu" aria-label="Calendar range">
+          <option value="month">Month</option>
+          <option value="2week">2 weeks</option>
+          <option value="week">1 week</option>
+        </select>
       </div>
     </div>
   </header>
@@ -846,15 +850,6 @@
     return html;
   }
 
-  // The range dropdown; rendered once (in the first/only calendar's header row).
-  function buildModeMenu() {
-    return '<select class="modemenu" id="modeMenu" aria-label="Calendar range">' +
-      '<option value="month"' + (calMode === "month" ? " selected" : "") + ">Month</option>" +
-      '<option value="2week"' + (calMode === "2week" ? " selected" : "") + ">2 weeks</option>" +
-      '<option value="week"' + (calMode === "week" ? " selected" : "") + ">1 week</option>" +
-      "</select>";
-  }
-
   function buildCalendar(y, m, panelIndex, t) {
     var fw = firstWeekday(y, m);
     var dim = daysInMonth(y, m);
@@ -866,7 +861,6 @@
     html += '<button class="nav" type="button" data-nav="prev" aria-label="Previous month">‹</button>';
     html += '<button class="cal-title" type="button" data-pick="' + panelIndex + '">' +
       MONTHS[m] + ' <span class="yr">' + y + "</span></button>";
-    if (panelIndex === 0) html += buildModeMenu();
     html += '<button class="nav" type="button" data-nav="next" aria-label="Next month">›</button>';
     html += "</div>";
 
@@ -928,13 +922,12 @@
     chipCap = (calMode === "2week" ? 6 : 8);   // tall cells → show more before "+N"
     if (!weekStart) weekStart = sundayOf(todayISO());
     var sp = isoParts(weekStart), ep = isoParts(addDaysISO(weekStart, nDays - 1));
-    var title = rangeLabel(sp, ep);
+    var title = MONTHS[sp.m] + ' <span class="yr">' + sp.y + "</span>";   // Month Year (no day range)
 
     var html = '<section class="cal weekcal">';
     html += '<div class="cal-head">';
     html += '<button class="nav" type="button" data-nav="prev" aria-label="Previous">‹</button>';
-    html += '<span class="cal-title-static">' + esc(title) + "</span>";
-    html += buildModeMenu();
+    html += '<span class="cal-title-static">' + title + "</span>";
     html += '<button class="nav" type="button" data-nav="next" aria-label="Next">›</button>';
     html += "</div>";
     html += '<div class="dow">' + DOW.map(function (d) { return "<span>" + d + "</span>"; }).join("") + "</div>";
@@ -946,7 +939,7 @@
     html += "</div></section>";
     host.innerHTML = html;
 
-    var sub = (calMode === "2week" ? "2 weeks · " : "This week · ") + title;
+    var sub = (calMode === "2week" ? "2 weeks" : "1 week") + " · " + MONTHS[sp.m] + " " + sp.y;
     if (meta && meta.generatedAt) sub += "  ·  data as of " + String(meta.generatedAt).slice(0, 10);
     document.getElementById("sub").textContent = sub;
     adjustTbc();
@@ -963,6 +956,8 @@
     } else {
       var t = today(); ref = { y: t.y, m: t.m };
     }
+    var mm = document.getElementById("modeMenu");
+    if (mm) mm.value = calMode;
     closeDayPop();
     render();
     writeURL();
@@ -1381,6 +1376,8 @@
     view = (v === "list") ? "list" : "calendar";
     try { localStorage.setItem(VIEW_KEY, view); } catch (e) {}
     document.body.classList.toggle("view-list", view === "list");
+    var mm = document.getElementById("modeMenu");
+    if (mm) { mm.hidden = (view === "list"); mm.value = calMode; }   // range picker is calendar-only
     [].forEach.call(document.querySelectorAll("#viewToggle .vt"), function (b) {
       b.setAttribute("aria-selected", b.getAttribute("data-view") === view ? "true" : "false");
     });
@@ -1584,10 +1581,9 @@
       }, 180);
     });
 
-    // Range dropdown (delegated — the select is re-rendered on each render)
-    document.getElementById("cals").addEventListener("change", function (e) {
-      var mm = e.target.closest("#modeMenu");
-      if (mm) setCalMode(mm.value);
+    // Range dropdown (static, in the top header next to Today)
+    document.getElementById("modeMenu").addEventListener("change", function () {
+      setCalMode(this.value);
     });
 
     document.getElementById("cals").addEventListener("click", function (e) {
