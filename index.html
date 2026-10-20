@@ -353,7 +353,16 @@
   .dp-title { margin: 0; font-size: 0.82rem; font-weight: 700; }
   .dp-close { background: none; border: none; color: var(--faint); font-size: 1.15rem; line-height: 1; cursor: pointer; padding: 0 2px; }
   .dp-close:hover { color: var(--fg); }
-  .dp-list { overflow-y: auto; padding: 9px 10px; display: flex; flex-direction: column; gap: 7px; overscroll-behavior: contain; }
+  .dp-list {
+    flex: 1 1 auto; min-height: 0;            /* let it shrink inside the capped popover so it actually scrolls */
+    overflow-y: scroll; scrollbar-gutter: stable; padding: 9px 6px 9px 10px; display: flex; flex-direction: column; gap: 7px; overscroll-behavior: contain;
+    scrollbar-width: thin; scrollbar-color: var(--muted) var(--surface-2);
+  }
+  .dp-list::-webkit-scrollbar { width: 12px; }
+  .dp-list::-webkit-scrollbar-track { background: var(--surface-2); border-radius: 6px; margin: 4px 0; }
+  .dp-list::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 6px; border: 3px solid var(--surface); }
+  .dp-list::-webkit-scrollbar-thumb:hover { background: var(--fg); }
+  .dp-list > details.lrow { flex: 0 0 auto; }   /* keep natural height; don't shrink to fit (so the list scrolls) */
   .dp-list.drilled details.lrow:not([open]) { display: none; }   /* expanded event fills the popover; others hide */
   .dp-row { display: block; text-decoration: none; color: var(--fg); background: var(--surface-2); border: 1px solid var(--line); border-radius: 9px; padding: 8px 10px; }
   .dp-row:hover, .dp-row.sel { border-color: var(--accent-line); background: var(--accent-weak); }
