@@ -67,20 +67,35 @@ def main():
     ap.add_argument("--min-events", type=int, default=10)
     ap.add_argument("--min-ratio", type=float, default=0.5,
                     help="min fraction of the previously published count; below this, refuse")
+    ap.add_argument("--keep-past-days", type=int, default=45,
+                    help="carry past-dated events forward from the previous out file for this "
+                         "many days after they occur, so the calendar keeps a greyed history. "
+                         "0 disables carry-forward (past events drop as before).")
     ap.add_argument("--force", action="store_true")
     args = ap.parse_args()
+
+    today = datetime.datetime.now(datetime.timezone.utc).date().isoformat()
 
     events = load_events(args.events_dir)
     n = len(events)
     print(f"loaded {n} events from {args.events_dir}")
 
-    # --- guardrail ---
-    prev = 0
+    # previous out file (used for both the guardrail and carrying past events forward)
+    prev_events = []
     if os.path.exists(args.out):
         try:
-            prev = len(json.load(open(args.out, encoding="utf-8")).get("events", []))
+            prev_events = json.load(open(args.out, encoding="utf-8")).get("events", []) or []
         except Exception:
-            prev = 0
+            prev_events = []
+
+    # --- guardrail ---
+    # Compare the dump against the previous *upcoming* count only. The dump is
+    # upcoming-only (the digest skips past events); the out file also carries greyed
+    # past events, so counting those would make a healthy dump look like a partial one.
+    def is_upcoming(e):
+        d = e.get("date")
+        return (not d) or d >= today
+    prev = sum(1 for e in prev_events if is_upcoming(e))
     if not args.force:
         if n < args.min_events:
             print(f"GUARDRAIL: only {n} events (< --min-events {args.min_events}); refusing to write.",
@@ -122,6 +137,31 @@ def main():
         if e.get("date") and not iso_ok(e["date"]):
             e["date"] = None
 
+    # --- carry past events forward (greyed history) ---
+    # The digest only tracks upcoming events, so once an event's date passes it
+    # disappears from the dump. To keep it visible (dimmed, like the frontend's
+    # past styling) we re-add past-dated events from the previous out file for a
+    # bounded window. They are frozen as last seen and marked "seen" (never "new").
+    carried = 0
+    if args.keep_past_days > 0 and prev_events:
+        window_start = (datetime.date.fromisoformat(today)
+                        - datetime.timedelta(days=args.keep_past_days)).isoformat()
+        have = {e["id"] for e in events if e.get("id")}
+        for pe in prev_events:
+            d = pe.get("date")
+            if not d or not iso_ok(d):
+                continue
+            if window_start <= d < today and pe.get("id") not in have:
+                pe = dict(pe)
+                if pe.get("status") == "new":
+                    pe["status"] = "seen"
+                pe.setdefault("status", "seen")
+                events.append(pe)
+                have.add(pe.get("id"))
+                carried += 1
+        if carried:
+            print(f"carried {carried} past event(s) forward (>= {window_start})")
+
     events.sort(key=lambda e: (e.get("date") or "9999-99-99", -(e.get("score") or 0)))
 
     generated_at = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -133,6 +173,7 @@ def main():
             "eventCount": len(events),
             "newCount": sum(1 for e in events if e.get("status") == "new"),
             "datedCount": sum(1 for e in events if e.get("date")),
+            "pastCount": sum(1 for e in events if e.get("date") and e["date"] < today),
             "summary": summary,
             "gaps": gaps,
             "tracked": tracked,

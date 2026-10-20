@@ -56,6 +56,11 @@ since the sync pushes its own commits.
   prompt (the 6:52am one). That's where scraping and scoring live.
 - **The shape of `events.json`** (sorting, flags, the `meta` block) → `scripts/build_events.py`.
   It passes `summary` / `gaps` / `tracked` straight through from the digest's `meta/run`.
+- **Past events stay visible (greyed).** The digest only tracks upcoming events, so once a
+  date passes it drops from the dump. `build_events.py` carries past-dated events forward
+  from the previous `events.json` for `--keep-past-days` (default 45) and marks them
+  `status: "seen"`, so the calendar keeps a dimmed history instead of them vanishing. Set
+  `--keep-past-days 0` to go back to upcoming-only.
 - **How events are displayed** (calendar, list, filters, theming) → `index.html`.
 
 ## Gotchas
