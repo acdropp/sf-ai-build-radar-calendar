@@ -39,6 +39,8 @@
     --line-strong: #333a44;
     --accent: #7f93ff;
     --accent-weak: rgba(127, 147, 255, 0.14);
+    --accent-strong: #5366f0;                        /* 4–5 → a deeper blue */
+    --accent-strong-weak: rgba(83, 102, 240, 0.26);
     --accent-line: rgba(127, 147, 255, 0.45);
     --accent-fg: #0d0f13;
     --amber: #f0b254;
@@ -64,6 +66,8 @@
     --line-strong: #d2d7df;
     --accent: #2d44f0;
     --accent-weak: rgba(45, 68, 240, 0.10);
+    --accent-strong: #1b2bb8;                        /* 4–5 → a deeper blue */
+    --accent-strong-weak: rgba(27, 43, 184, 0.15);
     --accent-line: rgba(45, 68, 240, 0.40);
     --accent-fg: #ffffff;
     --amber: #a85c00;
@@ -272,10 +276,10 @@
     overflow: hidden; word-break: break-word;
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
   }
-  .ev.s-high { border-left-color: var(--accent); background: var(--accent-weak); }
-  .ev.s-mid  { border-left-color: var(--line-strong); }
-  .ev.s-low  { opacity: 0.5; }
-  .ev.verify { border-left-style: dashed; opacity: 0.5; }
+  .ev.s-high { border-left-color: var(--accent-strong); background: var(--accent-strong-weak); }  /* 4–5 darker blue */
+  .ev.s-blue { border-left-color: var(--accent); background: var(--accent-weak); }                /* 1–3 blue */
+  .ev.verify { border-left-style: dashed; border-left-color: var(--line-strong);
+               background: var(--surface-3); opacity: 0.5; }                                      /* unconfirmed → light grey */
   .ev .nbadge { color: var(--accent); font-weight: 700; margin-right: 2px; }
   .ev .ev-emoji { display: none; }   /* names on wide screens; emojis-only on phones (below) */
   .more {
@@ -478,9 +482,9 @@
   footer.legend { margin-top: 24px; padding-top: 14px; border-top: 1px solid var(--line); font-family: var(--font-mono); font-size: 0.68rem; color: var(--faint); display: flex; flex-wrap: wrap; gap: 6px 18px; }
   footer.legend .k { display: inline-flex; align-items: center; gap: 6px; }
   footer.legend .sw { width: 10px; height: 10px; border-radius: 3px; border-left: 2px solid; }
-  .sw.high { border-left-color: var(--accent); background: var(--accent-weak); }
-  .sw.mid { border-left-color: var(--line-strong); background: var(--surface-3); }
-  .sw.low { border-left-color: var(--line-strong); background: var(--surface-3); opacity: 0.5; }
+  .sw.strong { border-left-color: var(--accent-strong); background: var(--accent-strong-weak); }
+  .sw.blue { border-left-color: var(--accent); background: var(--accent-weak); }
+  .sw.grey { border-left-color: var(--line-strong); background: var(--surface-3); opacity: 0.5; }
 
   .empty-note { color: var(--faint); font-size: 0.85rem; padding: 20px; text-align: center; }
 
@@ -631,9 +635,9 @@
   </details>
 
   <footer class="legend">
-    <span class="k"><span class="sw high"></span> strong fit (4–5)</span>
-    <span class="k"><span class="sw mid"></span> fits (3)</span>
-    <span class="k"><span class="sw low"></span> low fit / unverified (dimmed, ≤2)</span>
+    <span class="k"><span class="sw strong"></span> strong fit (4–5)</span>
+    <span class="k"><span class="sw blue"></span> fits (1–3)</span>
+    <span class="k"><span class="sw grey"></span> unconfirmed / past (dimmed)</span>
     <span class="k"><span class="pill new" style="font-size:0.6rem">new</span> newly found</span>
     <span class="k"><span class="pill verify" style="font-size:0.6rem">verify</span> unconfirmed</span>
     <span class="k">⚠️ event outside San Francisco</span>
@@ -768,10 +772,9 @@
 
   function scoreTier(ev) {
     var s = ev.score || 0;
-    if (ev.needsVerification) return "verify";
-    if (s >= 4) return "high";
-    if (s === 3) return "mid";
-    return "low";
+    if (ev.needsVerification) return "verify";   // unconfirmed → light grey, whatever the score
+    if (s >= 4) return "high";                   // 4–5 → darker blue
+    return "blue";                               // 1–3 (and unscored) → blue
   }
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) {
