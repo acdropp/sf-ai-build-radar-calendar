@@ -354,6 +354,7 @@
   .dp-close { background: none; border: none; color: var(--faint); font-size: 1.15rem; line-height: 1; cursor: pointer; padding: 0 2px; }
   .dp-close:hover { color: var(--fg); }
   .dp-list { overflow-y: auto; padding: 9px 10px; display: flex; flex-direction: column; gap: 7px; overscroll-behavior: contain; }
+  .dp-list.drilled details.lrow:not([open]) { display: none; }   /* expanded event fills the popover; others hide */
   .dp-row { display: block; text-decoration: none; color: var(--fg); background: var(--surface-2); border: 1px solid var(--line); border-radius: 9px; padding: 8px 10px; }
   .dp-row:hover, .dp-row.sel { border-color: var(--accent-line); background: var(--accent-weak); }
   .dp-row .r-top { display: flex; align-items: baseline; gap: 8px; }
@@ -1461,9 +1462,21 @@
     var list = document.getElementById("dpList");
     // Reuse the list view's expandable row: click a row to reveal full detail.
     list.innerHTML = evs.map(function (ev) { return lrow(ev, isPast); }).join("");
-    // Re-place the popover whenever a row expands/collapses so it stays in view.
-    [].forEach.call(list.querySelectorAll("details.lrow"), function (dd) {
-      dd.addEventListener("toggle", clampPop);
+    list.classList.remove("drilled");
+    // Drill-in: opening an event closes the others and gives it the whole popover;
+    // closing it (click the title again) restores the list. Re-place so it stays in view.
+    var rows = list.querySelectorAll("details.lrow");
+    [].forEach.call(rows, function (dd) {
+      dd.addEventListener("toggle", function () {
+        if (dd.open) {
+          [].forEach.call(rows, function (o) { if (o !== dd && o.open) o.open = false; });
+          list.classList.add("drilled");
+          list.scrollTop = 0;
+        } else if (![].some.call(rows, function (o) { return o.open; })) {
+          list.classList.remove("drilled");
+        }
+        placePop();
+      });
     });
     dpSel = -1;
     list.scrollTop = 0;
