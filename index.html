@@ -277,6 +277,7 @@
   .ev.s-low  { opacity: 0.5; }
   .ev.verify { border-left-style: dashed; opacity: 0.5; }
   .ev .nbadge { color: var(--accent); font-weight: 700; margin-right: 2px; }
+  .ev .ev-emoji { display: none; }   /* names on wide screens; emojis-only on phones (below) */
   .more {
     font-family: var(--font-mono); font-size: 0.62rem; color: var(--accent);
     background: none; border: none; cursor: pointer; text-align: left; padding: 1px 5px;
@@ -457,6 +458,20 @@
   @media (max-width: 560px) {
     details.lrow summary { grid-template-columns: 50px 1fr 16px; grid-template-areas: "date main chev" "date meta chev" "date score chev"; }
     .l-score { align-items: flex-start; flex-direction: row; gap: 10px; margin-top: 4px; }
+    /* Cramped day cells: show just the type emojis, not the truncated names */
+    .ev.has-emoji .ev-name { display: none; }
+    .ev.has-emoji { display: block; }               /* no line-clamp box needed for emojis */
+    .ev.has-emoji .ev-emoji { display: inline; font-size: 0.92rem; letter-spacing: 1px; white-space: nowrap; }
+  }
+
+  /* 1-day agenda view (great on phones): the day's events as readable rows */
+  .cals.dayview { display: block; }
+  .cals.dayview .daycal { background: transparent; border: none; border-radius: 0; padding: 0; }
+  .cals.dayview .dayrows { margin-top: 12px; }
+  /* let the page scroll even in landscape for the day agenda (like list view) */
+  @media (orientation: landscape) {
+    body.cal-day .wrap { height: auto; overflow: visible; padding-bottom: 48px; }
+    body.cal-day header.app { position: sticky; top: 0; z-index: 20; }
   }
 
   /* Legend */
@@ -567,6 +582,7 @@
           <option value="month">Month</option>
           <option value="2week">2 weeks</option>
           <option value="week">1 week</option>
+          <option value="day">1 day</option>
         </select>
       </div>
     </div>
@@ -713,8 +729,10 @@
   // Calendar range mode: month (adaptive 1/3 months) | week (1 week) | 2week (2 weeks)
   var CALMODE_KEY = "radar-calmode";
   var calMode = "month";
-  try { var _cm = localStorage.getItem(CALMODE_KEY); if (_cm === "week" || _cm === "2week") calMode = _cm; } catch (e) {}
-  var weekStart = null;         // ISO date (Sunday) anchoring week/2-week modes
+  var calModeStored = false;    // did the viewer already pick a range mode?
+  var urlCalSet = false;        // did a deep link specify the range mode?
+  try { var _cm = localStorage.getItem(CALMODE_KEY); if (_cm === "week" || _cm === "2week" || _cm === "day") { calMode = _cm; calModeStored = true; } } catch (e) {}
+  var weekStart = null;         // ISO anchor date for day / week / 2-week modes
 
   // ----- Pure date helpers -----
   function pad(n) { return (n < 10 ? "0" : "") + n; }
@@ -847,10 +865,13 @@
       var tier = scoreTier(ev);
       var nb = ev.status === "new" ? '<span class="nbadge">•</span>' : "";
       var warn = regionInfo(ev).warn ? "⚠️ " : "";   // outside SF → flag on the chip
+      var emo = fmtTags(ev).map(function (f) { return f.emoji; }).join("");   // type emojis
       var t2 = timeStr(ev);
       var tip = warn + (t2 ? t2 + "  ·  " : "") + ev.name;
-      html += '<a class="ev s-' + tier + (ev.needsVerification ? " verify" : "") + '" href="' + esc(ev.url) + '" target="_blank" rel="noopener" title="' + esc(tip) + '">' +
-        nb + warn + esc(ev.name) + "</a>";
+      html += '<a class="ev s-' + tier + (ev.needsVerification ? " verify" : "") + (emo ? " has-emoji" : "") +
+        '" href="' + esc(ev.url) + '" target="_blank" rel="noopener" title="' + esc(tip) + '">' +
+        nb + warn + (emo ? '<span class="ev-emoji">' + emo + "</span>" : "") +
+        '<span class="ev-name">' + esc(ev.name) + "</span></a>";
     });
     if (crowded) {
       html += '<span class="morepill">+' + (evs.length - chipCap) + '<span class="tri"></span></span>';
@@ -894,6 +915,8 @@
   }
 
   function render() {
+    document.body.classList.remove("cal-day");
+    if (calMode === "day") { renderDay(); return; }
     if (calMode === "week" || calMode === "2week") { renderWeeks(); return; }
     var t = today();
     var host = document.getElementById("cals");
@@ -954,12 +977,39 @@
     adjustTbc();
   }
 
+  // 1-day agenda: the chosen day's events as readable rows (ideal on a phone).
+  function renderDay() {
+    document.body.classList.add("cal-day");
+    var t = today();
+    var host = document.getElementById("cals");
+    host.className = "cals dayview";
+    if (!weekStart) weekStart = todayISO();
+    var p = isoParts(weekStart);
+    var title = DOW[new Date(p.y, p.m, p.d).getDay()] + ", " + MONTHS_SHORT[p.m] + " " + p.d;
+    var tk = dateKey(t.y, t.m, t.d), isPast = weekStart < tk;
+    var evs = (byDate[weekStart] || []).slice();   // already sorted by score then time
+    var html = '<section class="cal daycal">';
+    html += '<div class="cal-head">';
+    html += '<button class="nav" type="button" data-nav="prev" aria-label="Previous day">‹</button>';
+    html += '<span class="cal-title-static">' + esc(title) + "</span>";
+    html += '<button class="nav" type="button" data-nav="next" aria-label="Next day">›</button>';
+    html += "</div>";
+    html += evs.length
+      ? '<div class="lrows dayrows">' + evs.map(function (ev) { return lrow(ev, isPast); }).join("") + "</div>"
+      : '<div class="empty-note">No events on this day.</div>';
+    html += "</section>";
+    host.innerHTML = html;
+    adjustTbc();
+  }
+
   function setCalMode(m) {
-    if (m !== "week" && m !== "2week") m = "month";
+    if (m !== "week" && m !== "2week" && m !== "day") m = "month";
     calMode = m;
     try { localStorage.setItem(CALMODE_KEY, m); } catch (e) {}
     if (m === "week" || m === "2week") {
       weekStart = sundayOf(todayISO());          // show the week today is part of
+    } else if (m === "day") {
+      weekStart = todayISO();                    // show today
     } else if (weekStart) {
       var p = isoParts(weekStart); ref = { y: p.y, m: p.m };   // month of where we were
     } else {
@@ -1337,7 +1387,7 @@
 
   function applyFilters() {
     rebuild();
-    if (view === "list") renderList();
+    if (view === "list") { document.body.classList.remove("cal-day"); renderList(); }
     else { renderTBC(); render(); }
     syncFilterUI();
     writeURL();
@@ -1347,9 +1397,9 @@
     var q;
     try { q = new URLSearchParams(location.search); } catch (e) { return; }
     var v = q.get("v"); if (v === "list" || v === "calendar") view = v;
-    var cm = q.get("cal"); if (cm === "week" || cm === "2week" || cm === "month") calMode = cm;
+    var cm = q.get("cal"); if (cm === "week" || cm === "2week" || cm === "month" || cm === "day") { calMode = cm; urlCalSet = true; }
     var w = q.get("w");
-    if (w && /^\d{4}-\d{2}-\d{2}$/.test(w)) { weekStart = sundayOf(w); urlRefSet = true; }
+    if (w && /^\d{4}-\d{2}-\d{2}$/.test(w)) { weekStart = (calMode === "day") ? w : sundayOf(w); urlRefSet = true; }
     var m = q.get("m");
     if (m && /^\d{4}-\d{1,2}$/.test(m)) {
       var pp = m.split("-"), yy = +pp[0], mm = +pp[1] - 1;
@@ -1369,7 +1419,7 @@
     var q = new URLSearchParams();
     q.set("v", view);
     if (view === "calendar") {
-      if (calMode === "week" || calMode === "2week") { q.set("cal", calMode); if (weekStart) q.set("w", weekStart); }
+      if (calMode === "week" || calMode === "2week" || calMode === "day") { q.set("cal", calMode); if (weekStart) q.set("w", weekStart); }
       else q.set("m", ref.y + "-" + pad(ref.m + 1));
     }
     if (filters.q) q.set("q", filters.q);
@@ -1397,6 +1447,7 @@
       cals.hidden = true;
       document.getElementById("tbcShelf").hidden = true;
       list.hidden = false;
+      document.body.classList.remove("cal-day");
       renderList();
     } else {
       list.hidden = true;
@@ -1414,6 +1465,7 @@
     var y = window.scrollY;
     if (calMode === "week") weekStart = addDaysISO(weekStart, delta * 7);
     else if (calMode === "2week") weekStart = addDaysISO(weekStart, delta * 14);
+    else if (calMode === "day") weekStart = addDaysISO(weekStart, delta);
     else ref = addMonths(ref.y, ref.m, delta);
     render();
     writeURL();
@@ -1424,6 +1476,7 @@
     closeDayPop();
     var t = today();
     if (calMode === "week" || calMode === "2week") weekStart = sundayOf(todayISO());
+    else if (calMode === "day") weekStart = todayISO();
     else ref = { y: t.y, m: t.m };
     render();
     writeURL();
@@ -1676,6 +1729,7 @@
     var wheelLock = 0;
     window.addEventListener("wheel", function (e) {
       if (view !== "calendar") return;                         // list view → normal page scroll
+      if (calMode === "day") return;                           // day agenda → normal page scroll
       if (!singleMode()) return;                               // portrait → let the page scroll
       if (document.querySelector(".overlay.open")) return;     // picker is open → let it scroll
       if (dpOpen()) return;                                    // popover open → let its list scroll
@@ -1693,7 +1747,10 @@
   readURL();                      // deep-link params set view / range / month / filters
   var t = today();
   if (!urlRefSet) ref = { y: t.y, m: t.m };
+  // First-time visitors on a small screen open in 1-day view (readable on a phone)
+  if (!calModeStored && !urlCalSet && !urlRefSet && window.innerWidth <= 560) calMode = "day";
   if ((calMode === "week" || calMode === "2week") && !weekStart) weekStart = sundayOf(todayISO());
+  if (calMode === "day" && !weekStart) weekStart = todayISO();
   loadData().then(function (data) {
     normalize(data);              // rebuild() applies the filters from the URL
     renderStale();
