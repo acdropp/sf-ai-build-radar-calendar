@@ -278,8 +278,9 @@
   }
   .ev.s-high { border-left-color: var(--accent-strong); background: var(--accent-strong-weak); }  /* 4–5 darker blue */
   .ev.s-blue { border-left-color: var(--accent); background: var(--accent-weak); }                /* 1–3 blue */
-  .ev.verify { border-left-style: dashed; border-left-color: var(--line-strong);
-               background: var(--surface-3); opacity: 0.5; }                                      /* unconfirmed → light grey */
+  /* unconfirmed → keep the blue score colour, signal "not final" with a full dashed outline */
+  .ev.verify { border: 1.5px dashed var(--accent); }
+  .ev.verify.s-high { border-color: var(--accent-strong); }
   .ev .nbadge { color: var(--accent); font-weight: 700; margin-right: 2px; }
   .ev .ev-emoji { display: none; }   /* names on wide screens; emojis-only on phones (below) */
   .more {
@@ -485,6 +486,7 @@
   .sw.strong { border-left-color: var(--accent-strong); background: var(--accent-strong-weak); }
   .sw.blue { border-left-color: var(--accent); background: var(--accent-weak); }
   .sw.grey { border-left-color: var(--line-strong); background: var(--surface-3); opacity: 0.5; }
+  .sw.dashed { border: 1.5px dashed var(--accent); background: var(--accent-weak); }
 
   .empty-note { color: var(--faint); font-size: 0.85rem; padding: 20px; text-align: center; }
 
@@ -637,7 +639,8 @@
   <footer class="legend">
     <span class="k"><span class="sw strong"></span> strong fit (4–5)</span>
     <span class="k"><span class="sw blue"></span> fits (1–3)</span>
-    <span class="k"><span class="sw grey"></span> unconfirmed / past (dimmed)</span>
+    <span class="k"><span class="sw dashed"></span> unconfirmed (details not final)</span>
+    <span class="k"><span class="sw grey"></span> past (dimmed)</span>
     <span class="k"><span class="pill new" style="font-size:0.6rem">new</span> newly found</span>
     <span class="k"><span class="pill verify" style="font-size:0.6rem">verify</span> unconfirmed</span>
     <span class="k">⚠️ event outside San Francisco</span>
@@ -772,7 +775,8 @@
 
   function scoreTier(ev) {
     var s = ev.score || 0;
-    if (ev.needsVerification) return "verify";   // unconfirmed → light grey, whatever the score
+    // Note: unconfirmed events keep their score colour; the separate "verify"
+    // class adds the dashed outline that signals "details not final".
     if (s >= 4) return "high";                   // 4–5 → darker blue
     return "blue";                               // 1–3 (and unscored) → blue
   }
