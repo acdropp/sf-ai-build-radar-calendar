@@ -1,41 +1,41 @@
 {
   "meta": {
-    "generatedAt": "2026-10-23T14:24:22Z",
-    "lastRunLabel": "Oct 23, 2026 · 6:58am PT",
+    "generatedAt": "2026-10-24T14:22:17Z",
+    "lastRunLabel": "Oct 24, 2026 · 6:55am PT",
     "source": "SF AI Build Radar digest (artifact DB)",
-    "eventCount": 103,
-    "newCount": 6,
-    "datedCount": 75,
-    "pastCount": 16,
-    "summary": "4 new today: Fireworks 'Deploy with Microsoft & NVIDIA' open-model hackathon (Nov 2, SF — build an eval, deploy a model in production and tune a tradeoff yourself; score 4); Production Agent Lab hands-on Workshop & Pitch Night (SF, date TBC, score 4); ClawMax.ai Build Night Silicon Valley (Qualcomm/Santa Clara — build night with a genuine local-model option via Ollama/LM Studio, score 4); and Multimodal Engineering Night (SF talks + community demos, score 3). UPDATED: 'Hack With YOU' is now a 'Halloween Edition' (new link luma.com/you-halloween, late-Oct, date still TBC); Breaking Models at Hacker Dojo confirmed Nov 1 2:30–4:30pm via iCal. PRUNED 3 now-past events (Oct 22: LMCache, National Renaissance, Training Agents IRL). No new 5/5 landed — your top own-your-AI fits remain Wiki3 Own Your Own AI (Oct 28, 5/5), Own Your AI Model Factory (Nov 3, 5/5) and On-Device AI (Nov 13, 5/5). THIS WEEK (Oct 23–29): Oct 23 TODAY — Cal Hacks 13.0 opens + Intelligence at Work (Menlo, 4/5) + Multi-Model @ AWS Loft (4/5) + Build for GTM. Oct 24 — Personal Agents Hackathon SF (4/5) + Google Gemma Hardware (Hillsborough, 4/5) + Robotics Hardware (4/5) + Agent Builders @ Omnara + Kane CLI + VibeCon/YC + Lovable×GirlsInVC + Debug Table. Oct 25 — Gemini 4 Argon + Bay Area AI+Car + Dell×NVIDIA (Frontier Tower). Oct 27 — Code Engineering: Software Factories (AWS Loft 6pm) + Silicon Valley Physical AI (Menlo). GOLD-STANDARD CLUSTER Oct 28 — Wiki3 Own Your Own AI (5/5) + ComfyUI Dev Platform Build Night (4/5) + SF Physical AI (4/5) + ODSC×Nebius (Burlingame, 4/5) + Oakland Claude Code. Oct 29 — Collaborative Agent Hackathon @ Stanford + Robot Hackathon (29–30).",
+    "eventCount": 106,
+    "newCount": 4,
+    "datedCount": 74,
+    "pastCount": 19,
+    "summary": "4 new today: Multiplayer Build Night & Mixer by Party (Redwood City — agent build + social with Claude Code/Cursor, 4/5); GenTeam Build Day: AI Agents for Real Estate (SF, Microsoft @ 555 California, 3/5); Hack for Social Impact 2026 (SF, Mission District, 3/5); and Ai Hacks — Jack London Edition (Oakland, 3/5). All four are date-TBC (real URLs, needsVerification). CONFIRMED: Breaking Models at Hacker Dojo is iCal-confirmed Nov 1, 2:30–4:00pm; a near-identical second Nov 1 session (3–4:30pm) still lists on its own Meetup page — almost certainly a relist of the same session, flagged. PRUNED 3 now-past Oct 23 events (Build for GTM, Intelligence at Work, Multi-Model). No new 5/5 landed — your top own-your-AI fits remain Wiki3 Own Your Own AI (Oct 28, 5/5), Own Your AI Model Factory (Nov 3, 5/5) and On-Device AI (Nov 13, 5/5). THIS WEEK (Oct 24–30): Oct 24 TODAY — Cal Hacks 13.0 (runs through 25) + Personal Agents Hackathon SF (4/5) + Google Gemma Hardware (Hillsborough, 4/5) + Robotics Hardware (4/5) + Agent Builders @ Omnara + Kane CLI + Lovable×GirlsInVC + VibeCon/YC + Debug Table (24–25). Oct 25 — Gemini 4 Argon + Bay Area AI+Car + Dell×NVIDIA (Frontier Tower). Oct 27 — Code Engineering: Software Factories (AWS Loft 6pm) + Silicon Valley Physical AI (Menlo). GOLD-STANDARD CLUSTER Oct 28 — Wiki3 Own Your Own AI (5/5, Hacker Dojo iCal-confirmed 6–7:30pm) + ComfyUI Dev Platform Build Night (4/5, comfy.org-confirmed 3–10pm) + SF Physical AI (4/5, 5:30pm) + ODSC×Nebius (Burlingame, 4/5) + Oakland Claude Code (iCal-confirmed). Oct 29 — Collaborative Agent Hackathon @ Stanford + Robot Hackathon (29–30). Oct 30 — Builder Base Buildathon (4/5) + Night Hack IV @ Founders Inc / Fort Mason (4/5, confirmed 4:15pm).",
     "gaps": [
-      "Recurring high-fit series still without a dated next instance: Vibe Coding Nights (Luma still 'Past Event'), Vibe Night Demos (#30, marked FULL, no date), Punk Software Hack Night (Imbue's Luma calendar this run shows only a live-music event, no hack night), Show Your AI Setup / Yes SF!, LlamaIndex Sudo Sunday, SF Demo Night — all still render with no new date. On watch.",
-      "Undated but kept (Luma calendar pages don't render per-event dates server-side, and these event pages show no date): Production Agent Lab (agentslab), ClawMax Build Night SV, Multimodal Engineering Night, Hack With YOU 'Halloween Edition', Nasiko hands-on workshop. Kept with real URLs, needsVerification.",
-      "Possible duplicate to resolve: two 'Breaking Models' AI-security sessions were listed for Nov 1 at Hacker Dojo ('Leak & Build' 2:30–4pm, event 315408286; 'Excessive Agency' 3–4:30pm, event 317016888). Hacker Dojo iCal now shows a SINGLE Session 5 on Nov 1, 2:30–4:30pm — the two are likely one relisted event; confirm and consolidate next run.",
-      "No AI/ML in-window at Noisebridge (games/electronics/woodworking only); SF Conversational AI (Foundry Live) iCal is empty (header only, no entries); SF Frontier Tech / Voxel51 Nov–Dec sessions are online Zoom (skipped); AI Tinkerers SF still shows no upcoming SF date (last SF event ~Sep 12).",
-      "Secondary sources not swept this run: Shack15, South Park Commons, Frontier Tower direct calendar, HackList SF, Codex SF, AGI Builders Meetup, ClickHouse Bay Area, Hugging Face standalone, AI Collective / genai-collective. AGI House events page renders JS-only (confirm via direct event links).",
-      "Back-half (Dec–Jan) still thin: nothing confirmed in-window past Dec 29 (ODSC×Nebius). No January SF build events surfaced on foundercal or ushackathons this run."
+      "Recurring high-fit series still without a dated next instance: Vibe Coding Nights (Luma still 'Past Event'), Vibe Night Demos #30 (FULL, no date), Punk Software Hack Night / Imbue (newest listing is still a past #SFTechWeek #9 edition — no next instance dated), Show Your AI Setup / Yes SF!, LlamaIndex Sudo Sunday, SF Demo Night. All on watch.",
+      "Undated but kept (event pages show no date; real URLs, needsVerification): the 4 new ones this run (Multiplayer Build Night / Redwood City, GenTeam Real Estate, Hack for Social Impact, Ai Hacks Jack London), plus prior: Production Agent Lab (agentslab), ClawMax Build Night SV, Multimodal Engineering Night, Hack With YOU 'Halloween Edition', Nasiko workshop.",
+      "Breaking Models duplicate: Hacker Dojo lists TWO Nov 1 AI-security sessions — 315408286 (2:30–4:00pm, iCal-listed) and 317016888 (3:00–4:30pm, confirmed live on its own page). Overlapping times, same title — almost certainly one relisted event. Kept both, flagged; consolidate if one drops.",
+      "ODSC×Nebius Oct 28: group iCal now describes it as a 'virtual build with livestream kickoff at ODSC AI West', while our doc lists it in-person at Burlingame (no conference pass needed). Reconcile the setting next run.",
+      "Not reached/empty this run: Noisebridge and SF Conversational AI (Foundry Live) iCals not re-fetched; AI Tinkerers SF still shows no upcoming SF date (last ~Sep 12); SF Frontier Tech / Voxel51 Nov–Dec sessions all online Zoom (skipped); two ODSC webinars (Nov 17/19) are pure online webinars (skipped).",
+      "Not swept this run (prior coverage stands): luma.com/sf, luma.com/sfvibehouse, luma.com/sfdn, Founders Inc full calendar, South Park Commons, Shack15, Frontier Tower direct calendar, AGI House (JS-only), HackList SF, Codex SF, AGI Builders, ClickHouse Bay Area, ushackathons, foundercal. Back-half (Dec–Jan) unchanged — nothing confirmed in-window past Dec 29 (ODSC×Nebius); no January SF build events surfaced."
     ],
     "tracked": [
       {
         "name": "Wiki3 · Own Your Own AI (Hacker Dojo)",
         "url": "https://www.meetup.com/hackerdojo/events/ngrgbvyjcmbnc/",
-        "why": "Your gold standard — biweekly local-first / own-your-AI workshops. Next Oct 28 6–7:30pm (Hacker Dojo iCal-confirmed), then ~Nov 11 & Nov 25. Dojo 5.0, 3200 Patrick Henry Dr, Santa Clara. (Series page itself shows only the past Sep 30 edition; iCal is the live source.)"
+        "why": "Your gold standard — biweekly local-first / own-your-AI workshops. Next Oct 28 6–7:30pm (Hacker Dojo iCal-confirmed, event 316671605), then ~Nov 11 & Nov 25. Dojo 5.0, 3200 Patrick Henry Dr, Santa Clara. (Series page itself still shows only the past Sep 30 edition; iCal is the live source.)"
       },
       {
         "name": "Own Your AI Model Factory Hack Night",
         "url": "https://www.meetup.com/ai-builders-and-learners-sf/events/316758369/",
-        "why": "Your AI Builders & Learners SF group — 'own your AI' agentic model-factory hack night, Nov 3 5–8pm at AWS Loft (iCal-reconfirmed this run)."
+        "why": "Your AI Builders & Learners SF group — 'own your AI' agentic model-factory hack night, Nov 3 5–8pm at AWS Loft (iCal-reconfirmed this run; RSVP on luma.com/uyo6mgp7)."
       },
       {
         "name": "ComfyUI Dev Platform Build Night",
         "url": "https://luma.com/5mydmvu6",
-        "why": "Open-source rebuild-paid-features-as-OSS build night — Oct 28 3–10pm at Frontier Tower (comfy.org re-confirmed this run)."
+        "why": "Open-source rebuild-paid-features-as-OSS build night — Oct 28 3–10pm at Frontier Tower (comfy.org re-confirmed this run as its only upcoming event)."
       },
       {
-        "name": "Fireworks open-model hackathon",
-        "url": "https://luma.com/fireworks-8kmc",
-        "why": "NEW this run — 'take open models and make your own frontier', deploy + tune yourself. Nov 2, 9am, SF (Fireworks × Microsoft × NVIDIA)."
+        "name": "On-Device AI Hackathon (Liquid × Qualcomm)",
+        "url": "https://ushackathons.com/go/on-device-ai-hackathon-cleared-for-takeoff",
+        "why": "Peak own-your-AI — build fully on-device with Liquid Foundation Models + Qualcomm, test offline, no cloud. Nov 13, 5pm, SF (5/5). Confirm venue."
       },
       {
         "name": "Vibe Coding Nights",
@@ -49,13 +49,13 @@
       },
       {
         "name": "Punk Software Hack Night (Imbue)",
-        "url": "https://luma.com/imbue_ai",
-        "why": "Anti-lock-in open-agent biweekly; Imbue's Luma calendar this run shows no hack-night instance (only a live-music event) — next instance not yet listed."
+        "url": "https://luma.com/h18z7837",
+        "why": "Anti-lock-in open-agent biweekly; Imbue's latest listing is still a past #SFTechWeek #9 edition — next instance not yet dated."
       },
       {
-        "name": "Physical AI Hack (Founders Inc SF Lab)",
-        "url": "https://luma.com/8ca2z1rr",
-        "why": "Hands-on physical-AI hackathon on real robots (LeRobot, Open Droid, open VLA models) at 2 Marina Blvd — strong fit; page shows 'Past Event', watching for next instance."
+        "name": "Night Hack @ Founders Inc (Fort Mason)",
+        "url": "https://luma.com/nighthack",
+        "why": "Build sprints, live demos only, robots+agents welcome. Next edition Oct 30 confirmed (4:15pm check-in, 5–10pm build, Fort Mason)."
       },
       {
         "name": "Show Your AI Setup / Yes SF! (The Kernel Dev)",
@@ -75,22 +75,17 @@
       {
         "name": "Devnovate",
         "url": "https://luma.com/devnovate",
-        "why": "Prolific free hackathons/buildathons/demo nights — Builder Base Buildathon Oct 30 (9:30am–7pm, reconfirmed), AI Startup Showcase Nov 4, HackwithBay 4.0 Nov 24, AI Demo Night Dec 4, Agentic AI Hackathon 2.0 Dec 15."
+        "why": "Prolific free hackathons/buildathons/demo nights — Builder Base Buildathon Oct 30 (9:30am–7pm), AI Startup Showcase Nov 4, HackwithBay 4.0 Nov 24, AI Demo Night Dec 4, Agentic AI Hackathon 2.0 Dec 15."
       },
       {
         "name": "AWS Builder Loft",
         "url": "https://luma.com/aws-builder-loft-events",
-        "why": "Frequent hands-on hackathons/workshops at 525 Market St; Code Engineering Oct 27, Fireworks open-model hackathon Nov 2, Hack With YOU 'Halloween Edition' (undated, new link)."
+        "why": "Frequent hands-on hackathons/workshops at 525 Market St; Code Engineering Oct 27, Fireworks open-model hackathon Nov 2, Hack With YOU 'Halloween Edition' (undated)."
       },
       {
         "name": "Cerebral Valley",
         "url": "https://cerebralvalley.ai/events",
         "why": "Agent / open-model hackathons across SF & Peninsula — Gemini 4 Argon (Oct 25), Fireworks (Nov 2), Even Day SF glasses (Nov 5), AIE Code Summit Hackathon (Nov 7)."
-      },
-      {
-        "name": "Founders Inc (Fort Mason)",
-        "url": "https://luma.com/nighthack",
-        "why": "Night Hack build sprints; Oct 30 confirmed (4:15pm, Fort Mason). Also hosts physical-AI hackathons at the SF Lab (2 Marina Blvd)."
       },
       {
         "name": "Frontier Tower",
@@ -100,22 +95,22 @@
       {
         "name": "ODSC AI SF",
         "url": "https://www.meetup.com/san-francisco-odsc/events/",
-        "why": "Free hands-on hackathons (Oct 28 Nebius + Dec 29 Nebius, iCal-confirmed). ODSC AI West Oct 27–29 + AI X Leadership Summit are paid conferences (excluded)."
+        "why": "Free hands-on hackathons (Oct 28 Nebius + Dec 29 Nebius). ODSC AI West Oct 27–29 + AI X Leadership Summit are paid conferences (excluded); two Nov webinars excluded. NB: Oct 28 Nebius iCal now reads 'virtual build + livestream kickoff' — verify setting."
       },
       {
         "name": "Voxel51 / SF Frontier Tech",
         "url": "https://www.meetup.com/san-francisco-frontier-tech-meetup/",
-        "why": "Hands-on OSS vision/robotics; SF Physical AI Oct 28 (in-person, Antler 144 Townsend). Nov–Dec sessions (Nov 5/11/19, Dec 10, incl. LeRobot) are online Zoom — skipped."
+        "why": "Hands-on OSS vision/robotics; SF Physical AI Oct 28 in-person (Antler, 144 Townsend). Nov–Dec sessions (Nov 5/9/11/19, Dec 10, incl. LeRobot) are online Zoom — skipped."
       },
       {
         "name": "ushackathons (SF aggregator)",
         "url": "https://ushackathons.com/hackathons/san-francisco",
-        "why": "Richest coverage (40+ AI-tagged upcoming). Nothing new vs. our set this run; /events/ pages give date+city, venues/times often needsVerification."
+        "why": "Richest coverage (40+ AI-tagged upcoming). Not re-swept this run; prior set stands. /events/ pages give date+city, venues/times often needsVerification."
       },
       {
         "name": "foundercal (SF hackathon aggregator)",
         "url": "https://foundercal.com/cities/sf/hackathons",
-        "why": "Source for Agent Builders @ Omnara (Oct 24), Own Your AI (Nov 3), Company Brain (Nov 4), Antler After Dark V2 (Nov 12) & V3 (Dec 3), ClawMax SF (Nov 18). Lists no January SF events."
+        "why": "Source for Own Your AI (Nov 3), Company Brain (Nov 4), Antler After Dark V2 (Nov 12) & V3 (Dec 3), ClawMax SF (Nov 18). Lists no January SF events."
       },
       {
         "name": "AI Tinkerers SF",
@@ -130,12 +125,12 @@
       {
         "name": "Cognee / genai-sf OSS",
         "url": "https://luma.com/genai-sf",
-        "why": "Open-source memory/agent events; surfaced Nasiko (prior run). Many listings still undated (Durable AI, AI Infrastructure Night, Milvus) — confirm dates next run."
+        "why": "Open-source memory/agent events + broad SF feed. This run surfaced Multiplayer Build Night (Redwood City), GenTeam Real Estate build day and Hack for Social Impact. Many listings still undated — confirm on event pages."
       },
       {
         "name": "discover / sf / ai (Luma)",
         "url": "https://luma.com/discover/sf/ai",
-        "why": "Broad SF AI discovery feed — surfaced Production Agent Lab, ClawMax SV and Multimodal Engineering Night this run. Per-event dates not rendered on the feed; confirm on event pages."
+        "why": "Broad SF AI discovery feed — surfaced Ai Hacks Jack London (Oakland) this run. Per-event dates not rendered on the feed; confirm on event pages."
       }
     ]
   },
@@ -422,37 +417,6 @@
       "date": "2026-10-20",
       "dateDisplay": "Oct 20",
       "distanceNote": "Peninsula — Redwood City (~30 min south of SF)",
-      "endTime": null,
-      "fit": "Hands-on collaborative build + social — the mix you like — but Peninsula and a vendor-platform (Party) framing. Date not posted.",
-      "membership": "None stated",
-      "name": "Multiplayer Build Night & Mixer by Party (Peninsula)",
-      "needsVerification": false,
-      "price": "Free (approval required)",
-      "score": 3,
-      "setting": "in-person",
-      "source": "Luma / genai-sf",
-      "startTime": "6:00 PM",
-      "status": "seen",
-      "tags": [
-        "🛠️ build",
-        "🍻 social"
-      ],
-      "themes": [
-        "Live collaborative build on one shared project with AI agents (Party)",
-        "No Party/Cursor/Claude Code experience needed",
-        "Capped at 50; food + drinks"
-      ],
-      "tz": "PT",
-      "url": "https://luma.com/1lmjxg95",
-      "venue": "810 Hamilton St",
-      "id": "multiplayer-build-night-party"
-    },
-    {
-      "address": "810 Hamilton St, Redwood City, CA 94063",
-      "city": "Redwood City",
-      "date": "2026-10-20",
-      "dateDisplay": "Oct 20",
-      "distanceNote": "Peninsula — Redwood City (~30 min south of SF)",
       "endTime": "6:00 PM",
       "fit": "Full-day hands-on build with collaborative AI agents, but Peninsula and a vendor-platform framing. Date still unposted.",
       "membership": "None required",
@@ -698,37 +662,6 @@
       "address": "",
       "city": "San Francisco",
       "date": "2026-10-23",
-      "dateDisplay": "Oct 23",
-      "distanceNote": "",
-      "endTime": null,
-      "fit": "Hands-on multiplayer AI build day in SF; GTM/business framing rather than own-your-AI. Venue/time TBC.",
-      "membership": "None stated",
-      "name": "Build for GTM: A Multiplayer AI Hackathon",
-      "needsVerification": true,
-      "price": "Not shown",
-      "score": 3,
-      "setting": "in-person",
-      "source": "ushackathons",
-      "startTime": null,
-      "status": "seen",
-      "tags": [
-        "🦾 hackathon",
-        "🛠️ build"
-      ],
-      "themes": [
-        "Multiplayer AI hackathon",
-        "Go-to-market theme",
-        "San Francisco"
-      ],
-      "tz": "PT",
-      "url": "https://ushackathons.com/events/build-for-gtm-a-multiplayer-ai-hackathon",
-      "venue": "San Francisco (venue TBC)",
-      "id": "build-for-gtm-a-multiplayer-ai-hackathon"
-    },
-    {
-      "address": "",
-      "city": "San Francisco",
-      "date": "2026-10-23",
       "dateDisplay": "Oct 23–25",
       "distanceNote": "",
       "endTime": null,
@@ -755,6 +688,37 @@
       "url": "https://ushackathons.com/events/cal-hacks-13-0",
       "venue": "San Francisco (venue TBC)",
       "id": "cal-hacks-13-0"
+    },
+    {
+      "address": "",
+      "city": "San Francisco",
+      "date": "2026-10-23",
+      "dateDisplay": "Oct 23",
+      "distanceNote": "",
+      "endTime": null,
+      "fit": "Hands-on multiplayer AI build day in SF; GTM/business framing rather than own-your-AI. Venue/time TBC.",
+      "membership": "None stated",
+      "name": "Build for GTM: A Multiplayer AI Hackathon",
+      "needsVerification": true,
+      "price": "Not shown",
+      "score": 3,
+      "setting": "in-person",
+      "source": "ushackathons",
+      "startTime": null,
+      "status": "seen",
+      "tags": [
+        "🦾 hackathon",
+        "🛠️ build"
+      ],
+      "themes": [
+        "Multiplayer AI hackathon",
+        "Go-to-market theme",
+        "San Francisco"
+      ],
+      "tz": "PT",
+      "url": "https://ushackathons.com/events/build-for-gtm-a-multiplayer-ai-hackathon",
+      "venue": "San Francisco (venue TBC)",
+      "id": "build-for-gtm-a-multiplayer-ai-hackathon"
     },
     {
       "address": "Hillsborough, CA",
@@ -1503,8 +1467,8 @@
       "date": "2026-11-01",
       "dateDisplay": "Nov 1",
       "distanceNote": "South Bay — Hacker Dojo (Santa Clara)",
-      "endTime": "4:30 PM",
-      "fit": "AI-security session at Hacker Dojo (your gold-standard venue), but discussion-format and South Bay. Hacker Dojo iCal now shows a single 'Session 5' on Nov 1, 2:30–4:30pm.",
+      "endTime": "4:00 PM",
+      "fit": "AI-security session at Hacker Dojo (your gold-standard venue), but discussion-format and South Bay. Hacker Dojo iCal confirms a single session on Nov 1, 2:30–4:00pm.",
       "membership": "None required",
       "name": "Breaking Models 🚨 AI Security (Hacker Dojo)",
       "needsVerification": false,
@@ -1535,7 +1499,7 @@
       "dateDisplay": "Nov 1",
       "distanceNote": "South Bay — Hacker Dojo (Santa Clara)",
       "endTime": "4:30 PM",
-      "fit": "AI-security session at Hacker Dojo (your gold-standard venue); discussion-format and South Bay. A second Nov 1 session alongside the 'Leak & Build' one — possible overlap/relisting, so verify.",
+      "fit": "A second 'Breaking Models' AI-security session listed for Nov 1 at Hacker Dojo (3–4:30pm), overlapping the 2:30–4:00pm one. Its own Meetup page confirms it's scheduled, but it's very likely a relisting of the same session — discussion-format, South Bay.",
       "membership": "None required",
       "name": "Breaking Models 🚨 AI Security — Excessive Agency (Hacker Dojo)",
       "needsVerification": true,
@@ -1544,7 +1508,7 @@
       "setting": "in-person",
       "source": "Meetup / Hacker Dojo",
       "startTime": "3:00 PM",
-      "status": "new",
+      "status": "seen",
       "tags": [
         "🗣️ discussion",
         "👩🏽‍🏫 lecture"
@@ -1575,7 +1539,7 @@
       "setting": "in-person",
       "source": "Cerebral Valley / Luma",
       "startTime": "9:00 AM",
-      "status": "new",
+      "status": "seen",
       "tags": [
         "🦾 hackathon",
         "🛠️ build",
@@ -2531,7 +2495,7 @@
       "setting": "in-person",
       "source": "Luma / discover-sf-ai",
       "startTime": "4:00 PM",
-      "status": "new",
+      "status": "seen",
       "tags": [
         "🛠️ build",
         "🎤 demo",
@@ -2595,7 +2559,7 @@
       "setting": "in-person",
       "source": "Luma / discover-sf-ai",
       "startTime": "4:30 PM",
-      "status": "new",
+      "status": "seen",
       "tags": [
         "🛠️ build",
         "🦾 hackathon",
@@ -2736,6 +2700,37 @@
       "id": "mem-off-open-source-ai-memory"
     },
     {
+      "address": "810 Hamilton St, Redwood City, CA 94063",
+      "city": "Redwood City",
+      "date": null,
+      "dateDisplay": "Date TBC",
+      "distanceNote": "Peninsula — Redwood City (~30–40 min from SF)",
+      "endTime": "8:30 PM",
+      "fit": "Build + social mixer with agent tooling — the hands-on community mix you like; cloud agents rather than own-your-AI, and on the Peninsula (Redwood City). Date not posted.",
+      "membership": "None stated",
+      "name": "Multiplayer Build Night & Mixer by Party (Peninsula)",
+      "needsVerification": true,
+      "price": "Not shown (approval required)",
+      "score": 4,
+      "setting": "in-person",
+      "source": "Luma / genai-sf",
+      "startTime": "5:45 PM",
+      "status": "new",
+      "tags": [
+        "🛠️ build",
+        "🍻 social"
+      ],
+      "themes": [
+        "Hands-on multiplayer-AI build session with agent tools (Claude Code, Cursor)",
+        "Doors + mixer, then an open build block running past 8:30pm",
+        "No prior experience required; capacity 50, registration reviewed"
+      ],
+      "tz": "PT",
+      "url": "https://luma.com/1lmjxg95",
+      "venue": "810 Hamilton",
+      "id": "multiplayer-build-night-party"
+    },
+    {
       "address": "",
       "city": "San Francisco",
       "date": null,
@@ -2751,7 +2746,7 @@
       "setting": "in-person",
       "source": "Luma / genai-sf (Open Source AI Week)",
       "startTime": null,
-      "status": "new",
+      "status": "seen",
       "tags": [
         "🛠️ build",
         "👩🏽‍🏫 workshop"
@@ -2953,6 +2948,37 @@
       "id": "agent-builders-demo-night"
     },
     {
+      "address": "",
+      "city": "Oakland",
+      "date": null,
+      "dateDisplay": "Date TBC",
+      "distanceNote": "East Bay — Oakland (Jack London)",
+      "endTime": null,
+      "fit": "Hands-on AI hackathon in Oakland's Jack London district — build + community, though details are light and it's East Bay. Date not posted.",
+      "membership": "None stated",
+      "name": "Ai Hacks — Jack London Edition",
+      "needsVerification": true,
+      "price": "Not shown (approval required)",
+      "score": 3,
+      "setting": "in-person",
+      "source": "Luma / discover-sf-ai",
+      "startTime": null,
+      "status": "new",
+      "tags": [
+        "🦾 hackathon",
+        "🛠️ build"
+      ],
+      "themes": [
+        "AI hackathon, Jack London (Oakland) edition",
+        "In-person East Bay",
+        "Approval required; limited spots"
+      ],
+      "tz": "PT",
+      "url": "https://luma.com/qqt7c7pk",
+      "venue": "Register to see address",
+      "id": "ai-hacks-jack-london"
+    },
+    {
       "address": "900 Marin St, San Francisco, CA 94124",
       "city": "San Francisco",
       "date": null,
@@ -3014,6 +3040,68 @@
       "id": "from-satellite-to-signal-aws"
     },
     {
+      "address": "555 California St, San Francisco, CA",
+      "city": "San Francisco",
+      "date": null,
+      "dateDisplay": "Date TBC",
+      "distanceNote": "",
+      "endTime": "7:30 PM",
+      "fit": "Hands-on agent build evening in SF, but a narrow real-estate vertical and not own-your-AI. Date not posted.",
+      "membership": "None stated",
+      "name": "GenTeam Build Day: AI Agents for Real Estate",
+      "needsVerification": true,
+      "price": "Not shown",
+      "score": 3,
+      "setting": "in-person",
+      "source": "Luma / genai-sf",
+      "startTime": "5:00 PM",
+      "status": "new",
+      "tags": [
+        "🛠️ build",
+        "🗣️ discussion"
+      ],
+      "themes": [
+        "Evening build session on AI agents for real estate",
+        "Hosted at Microsoft, 555 California St",
+        "Build + wrap/Q&A by 7:30pm"
+      ],
+      "tz": "PT",
+      "url": "https://luma.com/genspark-3dj8",
+      "venue": "Microsoft",
+      "id": "genteam-build-day-real-estate"
+    },
+    {
+      "address": "1885 Mission St, San Francisco, CA 94103",
+      "city": "San Francisco",
+      "date": null,
+      "dateDisplay": "Date TBC",
+      "distanceNote": "",
+      "endTime": null,
+      "fit": "In-person SF hackathon with a build focus; social-impact framing rather than own-your-AI, and details are light. Date not posted.",
+      "membership": "None stated",
+      "name": "Hack for Social Impact 2026",
+      "needsVerification": true,
+      "price": "Not shown (approval required)",
+      "score": 3,
+      "setting": "in-person",
+      "source": "Luma / genai-sf",
+      "startTime": null,
+      "status": "new",
+      "tags": [
+        "🦾 hackathon",
+        "🛠️ build"
+      ],
+      "themes": [
+        "Social-impact hackathon",
+        "In-person SF (Mission District)",
+        "Approval required"
+      ],
+      "tz": "PT",
+      "url": "https://luma.com/59t8euck",
+      "venue": "1885 Mission St",
+      "id": "hack-for-social-impact-2026"
+    },
+    {
       "address": "First Market Tower, 525 Market St, San Francisco, CA 94105",
       "city": "San Francisco",
       "date": null,
@@ -3061,7 +3149,7 @@
       "setting": "in-person",
       "source": "Luma / discover-sf-ai",
       "startTime": "5:30 PM",
-      "status": "new",
+      "status": "seen",
       "tags": [
         "👩🏽‍🏫 lecture",
         "🎤 demo",
