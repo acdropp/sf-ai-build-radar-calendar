@@ -1,4 +1,4 @@
-# SF AI Build Radar — Operator's Guide
+# SF Space AI Event Search — Operator's Guide
 
 Updated Oct 12, 2026 · @Aaron
 
