@@ -1,6 +1,6 @@
-# SF Space AI Event Search — Calendar + List
+# 🔦 SF AI Event Search — Calendar + List
 
-A self-hosted calendar + list view of the **SF Space AI Event Search**: a daily-refreshed,
+A self-hosted calendar + list view of the **🔦 SF AI Event Search**: a daily-refreshed,
 taste-scored feed of hands-on AI builder events in the Bay Area (Luma, Meetup /
 Hacker Dojo, AI Tinkerers, and off-platform hacker houses).
 
