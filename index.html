@@ -711,8 +711,6 @@
   .pill { font-family: var(--font-body); border-radius: 6px; font-weight: 600; letter-spacing: 0; text-transform: none; font-size: 0.66rem; }
   .pill.new { background: var(--accent); color: var(--accent-fg); }
   .pill.dist { background: var(--amber-weak); color: var(--amber); }
-  /* Light themes: the region tag in list view takes the theme hue instead of red */
-  :root:not([data-skin="bat"]) .listview .pill.dist { background: var(--accent-strong-weak); color: var(--accent-ink); }
 
   /* List view: white task-style cards, section titles in the hue */
   .lsec-head h2 { color: var(--panel-title); font-family: var(--font-body); font-size: 0.95rem; font-weight: 600; letter-spacing: 0; text-transform: none; }
@@ -756,7 +754,7 @@
   :root[data-skin="green"]   { --hot: #16A34A; }
   :root[data-skin="pumpkin"] { --hot: #EE7A12; }
   :root:not([data-skin="bat"]) .meter[aria-label="score 5 of 5"] i.on { background: var(--hot); }
-  :root:not([data-skin="bat"]) .listview .pill.dist { background: var(--hot); color: #FFFFFF; }
+  :root:not([data-skin="bat"]) .pill.dist { background: var(--hot); color: #FFFFFF; }   /* list rows and the calendar day popover */
 
   /* Halloween garnish */
   :root[data-skin="pumpkin"] footer.legend::before { content: "🎃 Spooky season build nights"; width: 100%; color: var(--muted); font-weight: 600; }
