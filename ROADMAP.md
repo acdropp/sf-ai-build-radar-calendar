@@ -1,4 +1,4 @@
-# SF Space AI Event Search — Calendar Build Roadmap
+# 🔦 SF AI Event Search — Calendar Build Roadmap
 
 Updated Oct 12, 2026 · @Aaron
 

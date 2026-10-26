@@ -1,4 +1,4 @@
-# SF Space AI Event Search — Calendar + List Spec (as built)
+# 🔦 SF AI Event Search — Calendar + List Spec (as built)
 
 Updated Oct 12, 2026 · @Aaron
 
@@ -9,7 +9,7 @@ Updated Oct 12, 2026 · @Aaron
 
 ## Overview & goals
 
-A self-hosted web page that shows the SF Space AI Event Search's events in two switchable
+A self-hosted web page that shows the 🔦 SF AI Event Search's events in two switchable
 views — a month-grid calendar and a rich scored list — both reading one shared event
 file, hosted as a plain website anyone can open with no account.
 
@@ -88,7 +88,7 @@ The top-level `meta` object (written each run):
 {
   "generatedAt": "2026-10-12T14:00:02Z",
   "lastRunLabel": "Oct 12, 2026 · 7:00am PT",
-  "source": "SF AI Build Radar digest (artifact DB)",
+  "source": "SF AI Event Search digest (artifact DB)",
   "eventCount": 51, "newCount": 6, "datedCount": 45,
   "summary": "6 new today: …",
   "gaps": ["…coverage gaps this run…"],

@@ -169,7 +169,7 @@ def main():
         "meta": {
             "generatedAt": generated_at,
             "lastRunLabel": last_run_label,
-            "source": "SF AI Build Radar digest (artifact DB)",
+            "source": "SF AI Event Search digest (artifact DB)",
             "eventCount": len(events),
             "newCount": sum(1 for e in events if e.get("status") == "new"),
             "datedCount": sum(1 for e in events if e.get("date")),

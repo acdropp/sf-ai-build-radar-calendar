@@ -3,19 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>SF Space AI Event Search</title>
+<title>🔦 SF AI Event Search</title>
 <meta name="description" content="A daily-refreshed, taste-scored calendar of hands-on AI builder events in SF &amp; the Bay Area — hackathons, build nights, workshops and demo nights.">
 <!-- Social preview (Slack / iMessage / Discord / Twitter) -->
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="SF Space AI Event Search">
-<meta property="og:title" content="SF Space AI Event Search">
+<meta property="og:site_name" content="🔦 SF AI Event Search">
+<meta property="og:title" content="🔦 SF AI Event Search">
 <meta property="og:description" content="A daily-refreshed, taste-scored calendar of hands-on AI builder events in SF &amp; the Bay Area — hackathons, build nights, workshops and demo nights.">
 <meta property="og:url" content="https://acdropp.github.io/sf-ai-build-radar-calendar/">
 <meta property="og:image" content="https://acdropp.github.io/sf-ai-build-radar-calendar/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="SF Space AI Event Search">
+<meta name="twitter:title" content="🔦 SF AI Event Search">
 <meta name="twitter:description" content="A daily-refreshed, taste-scored calendar of hands-on AI builder events in SF &amp; the Bay Area.">
 <meta name="twitter:image" content="https://acdropp.github.io/sf-ai-build-radar-calendar/og-image.png">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ctext y='20' font-size='20'%3E%E2%97%86%3C/text%3E%3C/svg%3E">
@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
 <style>
-  /* SF Space AI Event Search — Calendar view (Phase 1)
+  /* SF AI Event Search — Calendar view (Phase 1)
      Dark charcoal dashboard, Archivo + JetBrains Mono, one ultramarine accent.
      A single shared reference month drives three consecutive calendars. */
   :root {
@@ -954,7 +954,7 @@
   <header class="app">
     <div class="headrow">
       <div>
-        <h1><span class="spark" aria-hidden="true">🔦</span> SF Space AI Event Search</h1>
+        <h1><span class="spark" aria-hidden="true">🔦</span> SF AI Event Search</h1>
       </div>
       <div class="head-right">
         <select class="modemenu" id="modeMenu" aria-label="Calendar range">
@@ -1553,7 +1553,7 @@
     var n = new Date();
     var dtstamp = n.getUTCFullYear() + pad2(n.getUTCMonth() + 1) + pad2(n.getUTCDate()) + "T" +
       pad2(n.getUTCHours()) + pad2(n.getUTCMinutes()) + pad2(n.getUTCSeconds()) + "Z";
-    return "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//SF Space AI Event Search//EN\r\nCALSCALE:GREGORIAN\r\nMETHOD:PUBLISH\r\n" +
+    return "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//SF AI Event Search//EN\r\nCALSCALE:GREGORIAN\r\nMETHOD:PUBLISH\r\n" +
       (w.allDay ? "" : VTZ) +
       "BEGIN:VEVENT\r\nUID:" + uid + "\r\nDTSTAMP:" + dtstamp + "\r\n" + dt + "\r\n" +
       "SUMMARY:" + icsEscape(ev.name) + "\r\n" +

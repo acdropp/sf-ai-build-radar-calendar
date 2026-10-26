@@ -1,4 +1,4 @@
-# SF Space AI Event Search — Operator's Guide
+# 🔦 SF AI Event Search — Operator's Guide
 
 Updated Oct 12, 2026 · @Aaron
 
