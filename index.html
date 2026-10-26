@@ -748,6 +748,16 @@
   .mbtn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
   .stale { border-radius: 10px; }
 
+  /* Light themes: the bright hue (--hot) is kept for extreme emphasis only (warnings, 5/5 matches);
+     everything that used it as a fill or ink takes the deep heading colour instead */
+  :root:not([data-skin="bat"]) { --hot: #2563EB; --accent: var(--panel-title); --accent-ink: var(--panel-title); --accent-strong: var(--panel-title); --today: var(--panel-title); --dot-on: var(--panel-title); }
+  :root[data-skin="pink"]    { --hot: #E11D48; }
+  :root[data-skin="purple"]  { --hot: #9333EA; }
+  :root[data-skin="green"]   { --hot: #16A34A; }
+  :root[data-skin="pumpkin"] { --hot: #EE7A12; }
+  :root:not([data-skin="bat"]) .meter[aria-label="score 5 of 5"] i.on { background: var(--hot); }
+  :root:not([data-skin="bat"]) .listview .pill.dist { background: var(--hot); color: #FFFFFF; }
+
   /* Halloween garnish */
   :root[data-skin="pumpkin"] footer.legend::before { content: "🎃 Spooky season build nights"; width: 100%; color: var(--muted); font-weight: 600; }
   :root[data-skin="bat"] footer.legend::before { content: "🦇 made for builders who like to go deep"; width: 100%; color: var(--muted); font-weight: 600; }
