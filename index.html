@@ -731,6 +731,12 @@
   .l-btn.ghost { background: transparent; color: var(--accent-ink); border-color: var(--accent-line); }
   .lpanel, .track { background: var(--panel); border: 1px solid var(--panel-line); border-radius: 16px; }
   .track a { color: var(--accent-ink); font-family: var(--font-body); }
+  /* Light themes: the list sits on a pastel panel like the calendar; detail labels take the theme ink */
+  :root:not([data-skin="bat"]) .listview { background: var(--panel); border: 1px solid var(--panel-line); border-radius: 16px; padding: 14px; }
+  :root[data-skin="pumpkin"] .listview { border-radius: 22px; }
+  :root:not([data-skin="bat"]) .listview .lpanel, :root:not([data-skin="bat"]) .listview .track { background: var(--surface); }
+  .l-meta { font-size: 0.86rem; }   /* all themes: meta line matches the detail text size */
+  :root:not([data-skin="bat"]) .l-detail dt { color: var(--accent-ink); font-weight: 600; }
 
   /* Popover + modal: white sheet, radius 16, soft lift */
   .daypop, .modal { background: var(--surface); border-color: var(--row-line); border-radius: 16px; box-shadow: var(--shadow-pop); }
