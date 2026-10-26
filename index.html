@@ -594,6 +594,7 @@
   :root[data-skin="pink"]   { --panel: #FEE2E2; --panel-line: #FECACA; --panel-title: #7F1D1D; --card: #FFFCFC; --chip: #FEF2F2; --chip-line: #FCA5A5; --surface-2: #FFFCFC; --surface-3: #FEF2F2; --chip: #FFE4E6; --chip-line: #FDA4AF; --accent: #E11D48; --accent-ink: #BE123C; --accent-wash: #FFF1F2; --accent-weak: #FFF1F2; --accent-strong: #E11D48; --accent-strong-weak: #FECDD3; --accent-line: rgba(225,29,72,.45); --accent-soft: #FDA4AF; --dot-on: #E11D48; --today: #E11D48; --btn-shadow: #9F1239; }
   :root[data-skin="purple"] { --panel: #F3E8FF; --panel-line: #E9D5FF; --panel-title: #581C87; --card: #FDFAFF; --chip: #FAF5FF; --chip-line: #D8B4FE; --surface-2: #FDFAFF; --surface-3: #FAF5FF; --chip: #F3E8FF; --chip-line: #D8B4FE; --accent: #9333EA; --accent-ink: #7E22CE; --accent-wash: #FAF5FF; --accent-weak: #FAF5FF; --accent-strong: #9333EA; --accent-strong-weak: #E9D5FF; --accent-line: rgba(147,51,234,.45); --accent-soft: #D8B4FE; --dot-on: #9333EA; --today: #9333EA; --btn-shadow: #6B21A8; }
   :root[data-skin="green"]  { --panel: #DCFCE7; --panel-line: #BBF7D0; --panel-title: #14532D; --card: #FCFFFD; --chip: #F0FDF4; --chip-line: #86EFAC; --surface-2: #FCFFFD; --surface-3: #F0FDF4; --chip: #DCFCE7; --chip-line: #86EFAC; --accent: #16A34A; --accent-ink: #15803D; --accent-wash: #F0FDF4; --accent-weak: #F0FDF4; --accent-strong: #16A34A; --accent-strong-weak: #BBF7D0; --accent-line: rgba(22,163,74,.45); --accent-soft: #86EFAC; --dot-on: #16A34A; --today: #16A34A; --btn-shadow: #166534; }
+  :root[data-skin="gold"]   { --panel: #FEF3C7; --panel-line: #FDE68A; --panel-title: #713F12; --card: #FFFDF5; --surface-2: #FFFDF5; --surface-3: #FFFBEB; --chip: #FEF3C7; --chip-line: #FCD34D; --accent: #CA8A04; --accent-ink: #A16207; --accent-wash: #FFFBEB; --accent-weak: #FFFBEB; --accent-strong: #CA8A04; --accent-strong-weak: #FDE68A; --accent-line: rgba(202,138,4,.45); --accent-soft: #FCD34D; --dot-on: #CA8A04; --today: #CA8A04; --btn-shadow: #854D0E; }   /* light twin of the black + gold dark mode */
 
   /* Halloween light: cream daylight, pushed toward pumpkin */
   :root[data-skin="pumpkin"] {
@@ -774,6 +775,11 @@
   .dp-head { background: var(--panel); border-bottom-color: var(--panel-line); }
   .dp-title, .modal h3 { color: var(--panel-title); font-weight: 600; }
   #dpList details.lrow { background: var(--surface); }
+  /* Day popover text: light themes give the setting the time's colour; dark themes give the labels the date/title colour
+     and the setting + description the location's colour */
+  :root:not([data-mode="dark"]) #dpList .l-meta .setting { color: var(--muted); }
+  :root[data-mode="dark"] #dpList .l-detail dt { color: var(--panel-title); }
+  :root[data-mode="dark"] #dpList .l-meta .setting, :root[data-mode="dark"] #dpList .l-themes li { color: var(--muted); }
   .overlay { background: rgba(17,24,39,.42); backdrop-filter: blur(2px); }
   .mbtn { border-radius: 10px; }
   .mbtn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
@@ -786,6 +792,7 @@
   :root[data-skin="purple"]  { --hot: #9333EA; }
   :root[data-skin="green"]   { --hot: #16A34A; }
   :root[data-skin="pumpkin"] { --hot: #EE7A12; }
+  :root[data-skin="gold"]    { --hot: #CA8A04; }
   :root:not([data-mode="dark"]) .meter[aria-label="score 5 of 5"] i.on { background: var(--hot); }
   :root:not([data-mode="dark"]) .pill.dist { background: var(--hot); color: #FFFFFF; }   /* list rows and the calendar day popover */
   :root[data-skin^="night-"] .pill.dist { background: var(--accent-strong-weak); color: var(--accent-ink); }   /* coloured dark modes: region tags in the hue too */
@@ -853,15 +860,14 @@
 </style>
 
 <script>
-/* Theme cycle. Five colours, each with a light and a dark version: blue, pink, purple, green, orange
-   (orange light is the Halloween look, shown with a pumpkin). The sun cycles light colours, the moon
-   cycles dark ones, and switching between sun and moon keeps the colour. The moon cycle ends on the
-   black + gold dark look, whose sun click returns to light blue. */
+/* Theme cycle. Six colours, each with a light and a dark version: blue, pink, purple, green, orange, gold
+   (orange is the Halloween pair, shown as 🎃 / 🦇; dark gold is the black + gold look). The sun cycles
+   light colours, the moon cycles dark ones, and switching between sun and moon keeps the colour. */
 (function () {
   var KEY = "radar-skin";
-  var LIGHT = ["blue", "pink", "purple", "green", "pumpkin"];
+  var LIGHT = ["blue", "pink", "purple", "green", "pumpkin", "gold"];
   var DARK = ["night-blue", "night-pink", "night-purple", "night-green", "night-orange", "bat"];
-  var NAMES = { blue: "Light · blue", pink: "Light · pink", purple: "Light · purple", green: "Light · green", pumpkin: "Halloween light",
+  var NAMES = { blue: "Light · blue", pink: "Light · pink", purple: "Light · purple", green: "Light · green", pumpkin: "Halloween light", gold: "Light · gold",
     "night-blue": "Dark · blue", "night-pink": "Dark · pink", "night-purple": "Dark · purple", "night-green": "Dark · green", "night-orange": "Dark · orange", bat: "Dark · black & gold" };
   var SUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
   var MOON = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
@@ -869,7 +875,7 @@
   function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function put(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
   function isDark(s) { return DARK.indexOf(s) >= 0; }
-  function lightOf(s) { var i = DARK.indexOf(s); return i < 0 ? s : (LIGHT[i] || LIGHT[0]); }   // black & gold → light blue
+  function lightOf(s) { var i = DARK.indexOf(s); return i < 0 ? s : LIGHT[i]; }
   function darkOf(s) { var i = LIGHT.indexOf(s); return DARK[i < 0 ? 0 : i]; }
   var skin = get(KEY); if (LIGHT.indexOf(skin) < 0 && !isDark(skin)) skin = "blue";
   function apply() { root.removeAttribute("data-theme"); root.setAttribute("data-skin", skin); root.setAttribute("data-mode", isDark(skin) ? "dark" : "light"); }
@@ -885,7 +891,7 @@
     var moonNext = dark ? DARK[(DARK.indexOf(skin) + 1) % DARK.length] : darkOf(skin);
     tile.title = (dark ? "" : NAMES[skin] + " · ") + "click for " + NAMES[tileNext];
     tile.setAttribute("aria-label", "Theme: " + tile.title); tile.setAttribute("aria-pressed", dark ? "false" : "true");
-    moon.innerHTML = MOON; moon.setAttribute("aria-pressed", dark ? "true" : "false");
+    moon.innerHTML = showing === "pumpkin" ? '<span aria-hidden="true">🦇</span>' : MOON;   // orange is the Halloween pair: 🎃 / 🦇 moon.setAttribute("aria-pressed", dark ? "true" : "false");
     moon.title = (dark ? NAMES[skin] + " · " : "") + "click for " + NAMES[moonNext];
     moon.setAttribute("aria-label", "Dark mode: " + moon.title);
   }
