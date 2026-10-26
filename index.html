@@ -775,11 +775,12 @@
   .dp-head { background: var(--panel); border-bottom-color: var(--panel-line); }
   .dp-title, .modal h3 { color: var(--panel-title); font-weight: 600; }
   #dpList details.lrow { background: var(--surface); }
-  /* Day popover text: light themes give the setting the time's colour; dark themes give the labels the date/title colour
-     and the setting + description the location's colour */
-  :root:not([data-mode="dark"]) #dpList .l-meta .setting { color: var(--muted); }
+  /* Day popover text: time, place, setting, detail values and description are pure black (light) or pure white (dark),
+     no greys; dark themes also give the labels the date/title colour */
+  #dpList .l-meta, #dpList .l-meta .t, #dpList .l-meta .loc, #dpList .l-meta .setting, #dpList .l-detail dd, #dpList .l-themes li { color: #000000; }
+  :root[data-mode="dark"] #dpList .l-meta, :root[data-mode="dark"] #dpList .l-meta .t, :root[data-mode="dark"] #dpList .l-meta .loc,
+  :root[data-mode="dark"] #dpList .l-meta .setting, :root[data-mode="dark"] #dpList .l-detail dd, :root[data-mode="dark"] #dpList .l-themes li { color: #FFFFFF; }
   :root[data-mode="dark"] #dpList .l-detail dt { color: var(--panel-title); }
-  :root[data-mode="dark"] #dpList .l-meta .setting, :root[data-mode="dark"] #dpList .l-themes li { color: var(--muted); }
   .overlay { background: rgba(17,24,39,.42); backdrop-filter: blur(2px); }
   .mbtn { border-radius: 10px; }
   .mbtn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
