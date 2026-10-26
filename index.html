@@ -711,6 +711,8 @@
   .pill { font-family: var(--font-body); border-radius: 6px; font-weight: 600; letter-spacing: 0; text-transform: none; font-size: 0.66rem; }
   .pill.new { background: var(--accent); color: var(--accent-fg); }
   .pill.dist { background: var(--amber-weak); color: var(--amber); }
+  /* Light themes: the region tag in list view takes the theme hue instead of red */
+  :root:not([data-skin="bat"]) .listview .pill.dist { background: var(--accent-strong-weak); color: var(--accent-ink); }
 
   /* List view: white task-style cards, section titles in the hue */
   .lsec-head h2 { color: var(--panel-title); font-family: var(--font-body); font-size: 0.95rem; font-weight: 600; letter-spacing: 0; text-transform: none; }
