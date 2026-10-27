@@ -102,7 +102,7 @@ intro of the "What's new" section; `gaps` and `tracked` power the two bottom pan
 ## Frontend — one self-contained `index.html`
 
 One page, no framework, no build step; two views behind a toggle, both fed by the same
-filtered event set. Default view is List on phones (≤600px wide) and Calendar everywhere else; a tap on the toggle is remembered per viewer and wins. The look (Cave Day
+filtered event set. Phones (≤600px wide) always open in List, with Calendar one tap away (its chips shrink to tiny 7.5px names); wider screens open in Calendar or the last view tapped on the toggle. The look (Cave Day
 pastel style, six colour themes each with a light and dark version, light blue default)
 is specified in `DESIGN.md`.
 

@@ -109,11 +109,14 @@ Layout details:
 
 ## Default view
 
-Phones (600px wide or less at load) open in **List**; everything wider, including phone
-landscape and the vertical monitor, opens in **Calendar**. Phone week view has no room for
-event text in seven columns, so List is the readable default there. A tap on the
-Calendar / List toggle is remembered per viewer (`radar-view-pick`) and wins over the
-default; a `?v=` deep link wins over both.
+Phones (600px wide or less at load) always open in **List**. Calendar is still there, one
+deliberate tap on the Calendar / List toggle away. Everything wider, including phone landscape
+and the vertical monitor, opens in **Calendar**, or in the last view tapped on the toggle
+(remembered per viewer as `radar-view-pick`). A `?v=` deep link wins over both.
+
+On phones (560px or less), calendar chips show **tiny names**: 7.5px text, up to 3 lines,
+no emojis. Names often break mid-word; it's a glanceable overview, and tapping a day opens
+the readable popover.
 
 ## Filter & search
 
