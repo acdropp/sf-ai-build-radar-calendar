@@ -4,7 +4,7 @@ A self-hosted calendar + list view of the **🔦 SF AI Event Search**: a daily-r
 taste-scored feed of hands-on AI builder events in the Bay Area (Luma, Meetup /
 Hacker Dojo, AI Tinkerers, and off-platform hacker houses).
 
-**Live:** [https://acdropp.github.io/sf-ai-build-radar-calendar/](https://acdropp.github.io/sf-ai-event-search-calendar/) — opens for anyone, no account.
+**Live:** https://acdropp.github.io/sf-ai-event-search-calendar/ — opens for anyone, no account.
 
 ## Status
 

@@ -4,8 +4,8 @@ Updated Oct 12, 2026 · @Aaron
 
 The site is built and live. This is how it runs day to day and how to change it.
 
-- **Live site:** https://acdropp.github.io/sf-ai-build-radar-calendar/
-- **Repo:** `github.com/acdropp/sf-ai-build-radar-calendar` (public)
+- **Live site:** https://acdropp.github.io/sf-ai-event-search-calendar/
+- **Repo:** `github.com/acdropp/sf-ai-event-search-calendar` (public)
 - **Upstream brain:** the Radar digest artifact `https://claude.ai/artifact/HGrcsBLV1hvx2DsP18QZsW` (its database is the source the sync reads).
 
 ## How the daily refresh works
