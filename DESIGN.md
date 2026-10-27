@@ -107,11 +107,18 @@ Layout details:
 - **Text sizes:** the meta line under each title (time · place · setting) matches the detail text size, 0.86rem, in every theme.
 - **Detail actions:** only **Open event** and **Add to calendar**. Add to calendar opens a themed menu with a 2px border in the Open event colour, offering Google Calendar and Apple / iOS (.ics).
 
+## Default view
+
+Phones (600px wide or less at load) open in **List**; everything wider, including phone
+landscape and the vertical monitor, opens in **Calendar**. Phone week view has no room for
+event text in seven columns, so List is the readable default there. A tap on the
+Calendar / List toggle is remembered per viewer (`radar-view-pick`) and wins over the
+default; a `?v=` deep link wins over both.
+
 ## Filter & search
 
 Hidden by default, opened and closed with 🔍. It auto-opens when a deep link carries filters. Its border takes the page background colour, so there's no coloured outline.
 
 ## Known issues
 
-- On phones, List view also shows an empty day-view block above the list. `.cals.dayview { display: block }` outranks `.cals[hidden]`. This predates the restyle and is not fixed yet.
 - TBC shelf chips still link straight to the event site, unlike calendar chips.

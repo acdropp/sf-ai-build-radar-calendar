@@ -102,7 +102,7 @@ intro of the "What's new" section; `gaps` and `tracked` power the two bottom pan
 ## Frontend — one self-contained `index.html`
 
 One page, no framework, no build step; two views behind a toggle, both fed by the same
-filtered event set. Default view is Calendar (remembered per viewer). The look (Cave Day
+filtered event set. Default view is List on phones (≤600px wide) and Calendar everywhere else; a tap on the toggle is remembered per viewer and wins. The look (Cave Day
 pastel style, six colour themes each with a light and dark version, light blue default)
 is specified in `DESIGN.md`.
 
@@ -202,7 +202,7 @@ partial scrape can't wipe the calendar. Commit messages double as a changelog, e
 
 **Views & density**
 
-- [x] A List ⇄ Calendar toggle switches views; last choice remembered.
+- [x] A List ⇄ Calendar toggle switches views; last tapped choice remembered; phones default to List.
 - [x] Score ≤2 / `needsVerification` events appear but are dimmed, not hidden.
 - [x] `new` and distance/region events carry badges.
 - [x] Undated events appear in the (collapsible) TBC shelf, never dropped.

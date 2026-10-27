@@ -470,6 +470,7 @@
 
   /* 1-day agenda view (great on phones): the day's events as readable rows */
   .cals.dayview { display: block; }
+  .cals.dayview[hidden] { display: none; }   /* otherwise List view on phones also shows an empty day view */
   .cals.dayview .daycal { background: transparent; border: none; border-radius: 0; padding: 0; }
   .cals.dayview .dayrows { margin-top: 12px; }
   /* let the page scroll even in landscape for the day agenda (like list view) */
@@ -1171,10 +1172,11 @@
     q: ""                       // keyword search
   };
   var pickerPanelIndex = 0;     // which calendar's heading opened the picker
-  var VIEW_KEY = "radar-view";
-  var view = "calendar";        // "calendar" | "list"
-  try { view = localStorage.getItem(VIEW_KEY) || "calendar"; } catch (e) {}
-  if (view !== "list") view = "calendar";
+  // Only a tap on the Calendar/List toggle is remembered; otherwise phones (≤600px wide) open in List
+  // and everything else in Calendar. (The old "radar-view" key was written on every load, so it is ignored.)
+  var VIEW_KEY = "radar-view-pick";
+  var view = window.matchMedia && window.matchMedia("(max-width: 600px)").matches ? "list" : "calendar";   // "calendar" | "list"
+  try { var picked = localStorage.getItem(VIEW_KEY); if (picked === "list" || picked === "calendar") view = picked; } catch (e) {}
 
   // Calendar range mode: month (adaptive 1/3 months) | week (1 week) | 2week (2 weeks)
   var CALMODE_KEY = "radar-calmode";
@@ -1884,9 +1886,9 @@
     try { history.replaceState(null, "", location.pathname + "?" + q.toString()); } catch (e) {}
   }
 
-  function setView(v) {
+  function setView(v, remember) {
     view = (v === "list") ? "list" : "calendar";
-    try { localStorage.setItem(VIEW_KEY, view); } catch (e) {}
+    if (remember) { try { localStorage.setItem(VIEW_KEY, view); } catch (e) {} }
     document.body.classList.toggle("view-list", view === "list");
     var mm = document.getElementById("modeMenu");
     if (mm) { mm.hidden = (view === "list"); mm.value = calMode; }   // range picker is calendar-only
@@ -2056,7 +2058,7 @@
     });
     document.getElementById("viewToggle").addEventListener("click", function (e) {
       var b = e.target.closest(".vt");
-      if (b) setView(b.getAttribute("data-view"));
+      if (b) setView(b.getAttribute("data-view"), true);
     });
 
     // TBC shelf remembers whether it's collapsed (default: expanded)
