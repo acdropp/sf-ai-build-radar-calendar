@@ -13,7 +13,7 @@ It all lives in the skin `<style>` block and the theme script in `<head>` of `in
 - **One typeface.** Poppins everywhere, including form controls. Only size, weight, italics
   and caps vary. Emoji fall through to the system emoji font.
 - **Nothing moves between views.** Header controls stay in the same place when switching
-  Calendar ⇄ List; only the range menu (calendar only) appears or disappears on the left.
+  Calendar ⇄ List; only the range menu and Today (both calendar only) appear or disappear on the left.
 - **Adapts to aspect ratio.** Landscape fills one month; portrait (Aaron uses a vertical
   monitor) stacks months. Everything is checked in both, plus phone width.
 
@@ -76,7 +76,7 @@ Left to right:
 
 - **Title:** "🔦 SF AI Event Search". It's the same size as the month heading.
 - **Range menu:** calendar view only.
-- **Today**
+- **Today:** calendar view only. It returns to the current month or week; List has no use for it.
 - **Sun / moon toggle**
 - **Calendar / List toggle:** icon-only, calendar and notepad icons.
 - **🔍:** toggles Filter & search, and shows a dot when filters are on.

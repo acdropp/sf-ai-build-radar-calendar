@@ -106,7 +106,7 @@ filtered event set. Phones (≤600px wide) always open in List, with Calendar on
 pastel style, six colour themes each with a light and dark version, light blue default)
 is specified in `DESIGN.md`.
 
-- **Header:** "🔦 SF AI Event Search", then range menu (calendar only) · Today · sun/moon theme toggle · icon-only Calendar/List toggle · 🔍 Filter & search. Controls never shift when switching views.
+- **Header:** "🔦 SF AI Event Search", then range menu and Today (both calendar only) · sun/moon theme toggle · icon-only Calendar/List toggle · 🔍 Filter & search. Controls never shift when switching views.
 - **Themes:** the sun cycles light colours (blue → pink → purple → green → 🎃 orange → gold); the moon cycles the matching dark versions (ending on black & gold); switching between sun and moon keeps the colour. Saved per viewer.
 
 ### Calendar view
