@@ -2,7 +2,7 @@
 
 Updated Oct 26, 2026 · @Aaron
 
-> **Status: built and live** at https://acdropp.github.io/sf-ai-build-radar-calendar/.
+> **Status: built and live** at https://acdropp.github.io/sf-ai-event-search-calendar/.
 > This document now describes the system as it actually works. The original plan was
 > written forward-looking; this version reflects what shipped (Phases 1–4 plus most of
 > Phase 5 — see `ROADMAP.md`).
@@ -166,7 +166,7 @@ partial scrape can't wipe the calendar. Commit messages double as a changelog, e
 
 ## Hosting, sharing & resilience
 
-- **Host:** GitHub Pages, served from the public `acdropp/sf-ai-build-radar-calendar` repo. Every push redeploys. Public URL opens in any browser with **no Claude/Anthropic account**.
+- **Host:** GitHub Pages, served from the public `acdropp/sf-ai-event-search-calendar` repo. Every push redeploys. Public URL opens in any browser with **no Claude/Anthropic account**.
 - **Why it meets "share with anyone":** the data is committed into the repo and baked into what the browser downloads, so there's no "beautiful empty calendar" failure mode a live-DB page could have.
 - **Audit trail, for free:** git history *is* a daily backup and a record of what changed run to run.
 - **Custom domain (optional, not done):** supported via a `CNAME` + DNS record if wanted later.

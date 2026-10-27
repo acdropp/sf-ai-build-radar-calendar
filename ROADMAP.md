@@ -5,7 +5,7 @@ Updated Oct 12, 2026 · @Aaron
 ## Where we are now
 
 **Phases 1–4 are done and live**, plus most of the Phase 5 extras. The site is public at
-https://acdropp.github.io/sf-ai-build-radar-calendar/ and refreshes itself every morning
+https://acdropp.github.io/sf-ai-event-search-calendar/ and refreshes itself every morning
 from the Radar digest. What remains is genuinely optional (a custom domain) or
 deliberately declined (a whole-calendar subscribe feed; retiring the artifact DB).
 
