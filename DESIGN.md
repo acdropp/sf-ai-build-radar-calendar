@@ -104,6 +104,7 @@ Layout details:
 ## List view
 
 - **Panel:** in light themes, the list sits on the theme's pastel panel, like the calendar. Rows are white cards with a hue left edge.
+- **Date column:** each row shows the day abbreviation (WED) centred above mm/dd, in the deep heading colour. Day popover rows share it.
 - **Text sizes:** the meta line under each title (time · place · setting) matches the detail text size, 0.86rem, in every theme.
 - **Detail actions:** only **Open event** and **Add to calendar**. Add to calendar opens a themed menu with a 2px border in the Open event colour, offering Google Calendar and Apple / iOS (.ics).
 

@@ -433,6 +433,9 @@
   details.lrow summary:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
   .l-date { grid-area: date; font-family: var(--font-mono); font-size: 0.82rem; font-weight: 600; color: var(--accent); font-variant-numeric: tabular-nums; padding-top: 1px; }
   .l-date .tbc { color: var(--faint); font-weight: 500; font-size: 0.72rem; }
+  /* day abbreviation centred above mm/dd; the pair stays left-aligned in its column */
+  .l-date { display: inline-flex; flex-direction: column; align-items: center; justify-self: start; align-self: start; line-height: 1.25; }
+  .l-dow { font-size: 0.68rem; letter-spacing: 0.06em; opacity: .8; }
   .l-main { grid-area: main; min-width: 0; }
   .l-name { font-weight: 650; font-size: 0.95rem; letter-spacing: -0.01em; }
   .l-warn { font-size: 0.9rem; }
@@ -1662,7 +1665,7 @@
     var fmts = fmtTags(ev);
 
     var dateCell = ev.date
-      ? "<span>" + esc(mmddNum(ev.date)) + "</span>"
+      ? '<span class="l-dow">' + ["SUN","MON","TUE","WED","THU","FRI","SAT"][new Date(ev.date + "T12:00:00").getDay()] + "</span><span>" + esc(mmddNum(ev.date)) + "</span>"
       : '<span class="tbc">TBC</span>';
     var time = timeStr(ev);
     var loc = esc([ev.venue, ev.city].filter(Boolean).join(", ")) || "—";
