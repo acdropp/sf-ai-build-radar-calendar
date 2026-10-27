@@ -281,7 +281,7 @@
   .ev.verify { border: 1.5px dashed var(--accent); }
   .ev.verify.s-high { border-color: var(--accent-strong); }
   .ev .nbadge { color: var(--accent); font-weight: 700; margin-right: 2px; }
-  .ev .ev-emoji { display: none; }   /* names on wide screens; emojis-only on phones (below) */
+  .ev .ev-emoji { display: none; }   /* chips always show names; phones shrink them (below) */
   .more {
     font-family: var(--font-mono); font-size: 0.62rem; color: var(--accent);
     background: none; border: none; cursor: pointer; text-align: left; padding: 1px 5px;
@@ -433,6 +433,9 @@
   details.lrow summary:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
   .l-date { grid-area: date; font-family: var(--font-mono); font-size: 0.82rem; font-weight: 600; color: var(--accent); font-variant-numeric: tabular-nums; padding-top: 1px; }
   .l-date .tbc { color: var(--faint); font-weight: 500; font-size: 0.72rem; }
+  /* day abbreviation centred above mm/dd; the pair stays left-aligned in its column */
+  .l-date { display: inline-flex; flex-direction: column; align-items: center; justify-self: start; align-self: start; line-height: 1.25; }
+  .l-dow { font-size: 0.68rem; letter-spacing: 0.06em; opacity: .8; }
   .l-main { grid-area: main; min-width: 0; }
   .l-name { font-weight: 650; font-size: 0.95rem; letter-spacing: -0.01em; }
   .l-warn { font-size: 0.9rem; }
@@ -462,14 +465,13 @@
   @media (max-width: 560px) {
     details.lrow summary { grid-template-columns: 50px 1fr 16px; grid-template-areas: "date main chev" "date meta chev" "date score chev"; }
     .l-score { align-items: flex-start; flex-direction: row; gap: 10px; margin-top: 4px; }
-    /* Cramped day cells: show just the type emojis, not the truncated names */
-    .ev.has-emoji .ev-name { display: none; }
-    .ev.has-emoji { display: block; }               /* no line-clamp box needed for emojis */
-    .ev.has-emoji .ev-emoji { display: inline; font-size: 0.92rem; letter-spacing: 1px; white-space: nowrap; }
+    /* Cramped day cells: tiny names (up to 3 lines) instead of emojis, so the calendar stays readable at a glance */
+    .cal .ev { font-size: 7.5px; line-height: 1.2; padding: 2px 3px; border-left-width: 2px; -webkit-line-clamp: 3; max-height: calc(3.6em + 4px); }
   }
 
   /* 1-day agenda view (great on phones): the day's events as readable rows */
   .cals.dayview { display: block; }
+  .cals.dayview[hidden] { display: none; }   /* otherwise List view on phones also shows an empty day view */
   .cals.dayview .daycal { background: transparent; border: none; border-radius: 0; padding: 0; }
   .cals.dayview .dayrows { margin-top: 12px; }
   /* let the page scroll even in landscape for the day agenda (like list view) */
@@ -1171,10 +1173,12 @@
     q: ""                       // keyword search
   };
   var pickerPanelIndex = 0;     // which calendar's heading opened the picker
-  var VIEW_KEY = "radar-view";
-  var view = "calendar";        // "calendar" | "list"
-  try { view = localStorage.getItem(VIEW_KEY) || "calendar"; } catch (e) {}
-  if (view !== "list") view = "calendar";
+  // Phones (≤600px wide) open in List; everything else opens in Calendar or the last view tapped on the toggle.
+  // (The old "radar-view" key was written on every load, so it is ignored.)
+  var VIEW_KEY = "radar-view-pick";
+  var view = window.matchMedia && window.matchMedia("(max-width: 600px)").matches ? "list" : "calendar";   // "calendar" | "list"
+  // Phones always open in List (Calendar is one deliberate tap away); wider screens restore the last tapped view.
+  if (view !== "list") { try { var picked = localStorage.getItem(VIEW_KEY); if (picked === "list" || picked === "calendar") view = picked; } catch (e) {} }
 
   // Calendar range mode: month (adaptive 1/3 months) | week (1 week) | 2week (2 weeks)
   var CALMODE_KEY = "radar-calmode";
@@ -1661,7 +1665,7 @@
     var fmts = fmtTags(ev);
 
     var dateCell = ev.date
-      ? "<span>" + esc(mmddNum(ev.date)) + "</span>"
+      ? '<span class="l-dow">' + ["SUN","MON","TUE","WED","THU","FRI","SAT"][new Date(ev.date + "T12:00:00").getDay()] + "</span><span>" + esc(mmddNum(ev.date)) + "</span>"
       : '<span class="tbc">TBC</span>';
     var time = timeStr(ev);
     var loc = esc([ev.venue, ev.city].filter(Boolean).join(", ")) || "—";
@@ -1884,9 +1888,9 @@
     try { history.replaceState(null, "", location.pathname + "?" + q.toString()); } catch (e) {}
   }
 
-  function setView(v) {
+  function setView(v, remember) {
     view = (v === "list") ? "list" : "calendar";
-    try { localStorage.setItem(VIEW_KEY, view); } catch (e) {}
+    if (remember) { try { localStorage.setItem(VIEW_KEY, view); } catch (e) {} }
     document.body.classList.toggle("view-list", view === "list");
     var mm = document.getElementById("modeMenu");
     if (mm) { mm.hidden = (view === "list"); mm.value = calMode; }   // range picker is calendar-only
@@ -2056,7 +2060,7 @@
     });
     document.getElementById("viewToggle").addEventListener("click", function (e) {
       var b = e.target.closest(".vt");
-      if (b) setView(b.getAttribute("data-view"));
+      if (b) setView(b.getAttribute("data-view"), true);
     });
 
     // TBC shelf remembers whether it's collapsed (default: expanded)

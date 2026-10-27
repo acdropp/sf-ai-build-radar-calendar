@@ -104,8 +104,20 @@ Layout details:
 ## List view
 
 - **Panel:** in light themes, the list sits on the theme's pastel panel, like the calendar. Rows are white cards with a hue left edge.
+- **Date column:** each row shows the day abbreviation (WED) centred above mm/dd, in the deep heading colour. Day popover rows share it.
 - **Text sizes:** the meta line under each title (time · place · setting) matches the detail text size, 0.86rem, in every theme.
 - **Detail actions:** only **Open event** and **Add to calendar**. Add to calendar opens a themed menu with a 2px border in the Open event colour, offering Google Calendar and Apple / iOS (.ics).
+
+## Default view
+
+Phones (600px wide or less at load) always open in **List**. Calendar is still there, one
+deliberate tap on the Calendar / List toggle away. Everything wider, including phone landscape
+and the vertical monitor, opens in **Calendar**, or in the last view tapped on the toggle
+(remembered per viewer as `radar-view-pick`). A `?v=` deep link wins over both.
+
+On phones (560px or less), calendar chips show **tiny names**: 7.5px text, up to 3 lines,
+no emojis. Names often break mid-word; it's a glanceable overview, and tapping a day opens
+the readable popover.
 
 ## Filter & search
 
@@ -113,5 +125,4 @@ Hidden by default, opened and closed with 🔍. It auto-opens when a deep link c
 
 ## Known issues
 
-- On phones, List view also shows an empty day-view block above the list. `.cals.dayview { display: block }` outranks `.cals[hidden]`. This predates the restyle and is not fixed yet.
 - TBC shelf chips still link straight to the event site, unlike calendar chips.
