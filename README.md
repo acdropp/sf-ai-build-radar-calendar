@@ -22,6 +22,7 @@ Radar digest with no manual step.
 | `scripts/build_events.py` | Deterministic transform: a dump of the digest DB → a clean, guarded `events.json`. Run by the daily sync task. |
 | `og-image.png` | Social-preview card (1200×630) referenced by the OpenGraph/Twitter tags. |
 | `SPEC.md` | The full as-built spec — architecture, data contract, features, pipeline, acceptance. |
+| `DESIGN.md` | The design spec — typography, colour themes and rules, header layout, per-view styling. |
 | `ROADMAP.md` | Phase-by-phase status (what shipped, what's declined). |
 | `HANDOFF.md` | Short operator's guide — how the pipeline runs, how to make changes. |
 

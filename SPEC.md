@@ -1,6 +1,6 @@
 # 🔦 SF AI Event Search — Calendar + List Spec (as built)
 
-Updated Oct 12, 2026 · @Aaron
+Updated Oct 26, 2026 · @Aaron
 
 > **Status: built and live** at https://acdropp.github.io/sf-ai-build-radar-calendar/.
 > This document now describes the system as it actually works. The original plan was
@@ -102,8 +102,12 @@ intro of the "What's new" section; `gaps` and `tracked` power the two bottom pan
 ## Frontend — one self-contained `index.html`
 
 One page, no framework, no build step; two views behind a toggle, both fed by the same
-filtered event set. Default view is Calendar (remembered per viewer); the whole thing
-themes light/dark (dark default; light uses the digest's color scheme).
+filtered event set. Default view is Calendar (remembered per viewer). The look (Cave Day
+pastel style, six colour themes each with a light and dark version, light blue default)
+is specified in `DESIGN.md`.
+
+- **Header:** "🔦 SF AI Event Search", then range menu (calendar only) · Today · sun/moon theme toggle · icon-only Calendar/List toggle · 🔍 Filter & search. Controls never shift when switching views.
+- **Themes:** the sun cycles light colours (blue → pink → purple → green → 🎃 orange → gold); the moon cycles the matching dark versions (ending on black & gold); switching between sun and moon keeps the colour. Saved per viewer.
 
 ### Calendar view
 
@@ -111,28 +115,31 @@ themes light/dark (dark default; light uses the digest's color scheme).
 - **Synchronized nav:** arrows and the month/year picker move the reference month; in the stacked view every visible month shifts together. The picker lands the chosen month in the calendar whose heading was clicked; works across year boundaries.
 - **Context-aware wheel:** scrolls the page in the stacked view; navigates months in the single-month landscape fill view.
 - **Today** resets to the current month. A clickable month/year heading opens the picker.
+- **Month rows are sized by content** (empty and past weeks shrink, busy current/future weeks grow).
 - **Event chips** show name-first (with a "new" dot) and carry score tier + verify styling. **Score + past dimming:** score ≤2 / `needsVerification` / past days are dimmed but never hidden.
-- **Clicking any day — a chip or empty space, one event or many — opens the anchored day popover** (fit-to-content, capped scroll, keyboard nav, edge-flipping) listing that day's events. Each popover row is the same expandable row as the list view: click it to reveal the full detail (When/Where/Setting/Admission/Format/Source, themes, why-it-fits, Open event / Add to calendar / Google Calendar). Crowded cells cap chips and show a "+N ▲" triangle.
+- **Chips are not links.** Only **Open event** in the detail leaves the page.
+- **Clicking any day — a chip or empty space, one event or many — opens the anchored day popover** (fit-to-content, capped scroll, keyboard nav, edge-flipping) listing that day's events. Each popover row is the same expandable row as the list view: click it to reveal the full detail (When/Where/Setting/Admission/Format/Source, themes, why-it-fits, **Open event** and **Add to calendar**). Crowded cells cap chips and show a "+N ▲" triangle.
 - **TBC shelf** ("No date yet · to be confirmed") sits below the calendar, is **collapsible** (default collapsed), and is **dropped automatically in short landscape** so it never squeezes the grid below a legible height.
 
 ### List view
 
-- **Collapsible digest rows.** Collapsed: `mm/dd · name (+ ⚠️ if outside SF) · format emojis · time · location · setting · score meter`. Expand for a `When / Where / Setting / Admission (price + membership) / Format / Source` block, 2–5 theme bullets, a "Why it fits you" box, **Add to calendar** (`.ics` + Google Calendar), and the event link.
+- **Collapsible digest rows.** Collapsed: `mm/dd · name (+ ⚠️ if outside SF) · format emojis · time · location · setting · score meter`. Expand for a `When / Where / Setting / Admission (price + membership) / Format / Source` block, 2–5 theme bullets, a "Why it fits you" box, **Open event**, and **Add to calendar** (a small menu: Google Calendar or Apple / iOS `.ics`).
 - **Collapsible sections**, each remembering its state, with defaults: This week (open), Upcoming (open), What's new since last run (collapsed), To be confirmed (collapsed), Past (collapsed). Order: This week → Upcoming → What's new → To be confirmed → Past.
 - **Coverage gaps this run** and **Recurring series on watch** panels (collapsed by default) render `meta.gaps` and `meta.tracked`.
 - **Region flags:** ⚠️ in the title when outside SF, plus a South Bay / East Bay / Online badge; NEW and VERIFY badges throughout.
 
 ### Filter, search & sharing
 
-- **One collapsible "Filter & search" card** (bordered like the TBC shelf, collapsed by default; auto-opens only when a deep link arrives with filters). Applies to **both views**:
+- **One "Filter & search" card, hidden behind the 🔍 header button** (the button shows a dot while filters are active; the card auto-opens only when a deep link arrives with filters). Applies to **both views**:
   keyword search (name / venue / city / themes / tags / fit), score ≥4, source (Luma / Meetup / Hacker Dojo), setting (in-person / online), SF-only distance, and hide unverified/low-fit. Live match count + Clear.
 - **Shareable deep links:** view, month, and every filter are mirrored to the URL — e.g. `?v=list&s=4&dist=sf`, `?v=calendar&m=2026-11`.
 
 ### Add to calendar (per event)
 
-Each dated event's detail offers an **`.ics` download** (data-URI, with an
+Each dated event's detail has one **Add to calendar** button that opens a small menu with
+**Google Calendar** (template link) and **Apple / iOS (.ics)** (data-URI download, with an
 `America/Los_Angeles` `VTIMEZONE` so times import correctly across Apple/Google/Outlook,
-and `VALUE=DATE` all-day when no start time) and a **Google Calendar** template link.
+and `VALUE=DATE` all-day when no start time).
 
 ### Other
 
@@ -210,3 +217,7 @@ partial scrape can't wipe the calendar. Commit messages double as a changelog, e
 **Beyond the original bar (Phase 5):** theme toggle, rich collapsible list, filters +
 search + hide, shareable deep links, per-event calendar export, social preview, coverage
 gaps / tracked panels, stale-data banner, collapsible sections, print styles.
+
+**Oct 2026 redesign:** Cave Day restyle and rename to 🔦 SF AI Event Search, six light +
+six dark colour themes, 🔍-toggled filters, content-sized month rows, non-link chips,
+Add to calendar menu. See `DESIGN.md`.
