@@ -1894,6 +1894,7 @@
     document.body.classList.toggle("view-list", view === "list");
     var mm = document.getElementById("modeMenu");
     if (mm) { mm.hidden = (view === "list"); mm.value = calMode; }   // range picker is calendar-only
+    document.getElementById("todayBtn").hidden = (view === "list");   // Today is calendar-only too
     [].forEach.call(document.querySelectorAll("#viewToggle .vt"), function (b) {
       b.setAttribute("aria-selected", b.getAttribute("data-view") === view ? "true" : "false");
     });
@@ -2056,7 +2057,7 @@
   function wire() {
     window.radarInitThemes(); window.radarInitExtras();
     document.getElementById("todayBtn").addEventListener("click", function () {
-      if (view === "calendar") goToday(); else window.scrollTo(0, 0);
+      goToday();
     });
     document.getElementById("viewToggle").addEventListener("click", function (e) {
       var b = e.target.closest(".vt");
