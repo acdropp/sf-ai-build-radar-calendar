@@ -100,6 +100,10 @@ Layout details:
   - n is the max chips per day, capped at 4. This only applies to grids with 4 or more rows.
 - **Chips** are not links. Clicking one opens the day popover. Only **Open event** leaves the page.
 - **Day popover:** white sheet with a pastel header, radius 16. Rows expand to the full detail.
+  - **Draggable:** the header is the handle (6-dot grip on the left, grab cursor). Drag it with mouse, finger or pen.
+    It can slide partly off the bottom or sides to uncover the grid, but the header always stays on-screen.
+    It keeps the dragged spot while you click other days; closing it (×, Esc, click outside, scroll, resize)
+    resets it, so the next one opens beside its day. Double-click the header to snap it back.
 
 ## List view
 

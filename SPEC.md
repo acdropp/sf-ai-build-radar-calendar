@@ -119,6 +119,7 @@ is specified in `DESIGN.md`.
 - **Event chips** show name-first (with a "new" dot) and carry score tier + verify styling. **Score + past dimming:** score ≤2 / `needsVerification` / past days are dimmed but never hidden.
 - **Chips are not links.** Only **Open event** in the detail leaves the page.
 - **Clicking any day — a chip or empty space, one event or many — opens the anchored day popover** (fit-to-content, capped scroll, keyboard nav, edge-flipping) listing that day's events. Each popover row is the same expandable row as the list view: click it to reveal the full detail (When/Where/Setting/Admission/Format/Source, themes, why-it-fits, **Open event** and **Add to calendar**). Crowded cells cap chips and show a "+N ▲" triangle.
+- **The day popover is draggable by its header** (pointer events: mouse, touch, pen; the header has `touch-action: none` so a finger drag moves the popover, not the page). After a drag it may slide partly off-screen, but its header stays fully visible. The dragged position sticks while other days are opened and resets when the popover closes; double-clicking the header snaps it back beside its day.
 - **TBC shelf** ("No date yet · to be confirmed") sits below the calendar, is **collapsible** (default collapsed), and is **dropped automatically in short landscape** so it never squeezes the grid below a legible height.
 
 ### List view
@@ -207,6 +208,7 @@ partial scrape can't wipe the calendar. Commit messages double as a changelog, e
 - [x] `new` and distance/region events carry badges.
 - [x] Undated events appear in the (collapsible) TBC shelf, never dropped.
 - [x] Clicking any day (chip or empty space) opens the day popover; each row expands to full detail and links out from there.
+- [x] The day popover can be dragged by its header (mouse and touch), stays grabbable, and remembers its spot until closed.
 - [x] Crowded days cap chips and offer a "+N" day popover.
 
 **Robustness**
