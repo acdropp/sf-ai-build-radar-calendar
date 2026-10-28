@@ -358,6 +358,14 @@
   .dp-title { margin: 0; font-size: 0.82rem; font-weight: 700; }
   .dp-close { background: none; border: none; color: var(--faint); font-size: 1.15rem; line-height: 1; cursor: pointer; padding: 0 2px; }
   .dp-close:hover { color: var(--fg); }
+  /* Drag handle: the header moves the popover (mouse, touch or pen) */
+  .dp-head { cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; }
+  .daypop.dragging .dp-head { cursor: grabbing; }
+  .daypop.dragging { box-shadow: 0 22px 60px rgba(0, 0, 0, 0.6); }
+  .dp-grip { flex: none; display: grid; grid-template-columns: repeat(2, 3px); gap: 3px; padding: 2px 2px 2px 0; opacity: 0.55; }
+  .dp-grip i { width: 3px; height: 3px; border-radius: 50%; background: currentColor; }
+  .dp-head:hover .dp-grip, .daypop.dragging .dp-grip { opacity: 0.9; }
+  .dp-title { flex: 1 1 auto; }
   .dp-list {
     flex: 1 1 auto; min-height: 0;            /* let it shrink inside the capped popover so it actually scrolls */
     overflow-y: scroll; scrollbar-gutter: stable; padding: 9px 6px 9px 10px; display: flex; flex-direction: column; gap: 7px; overscroll-behavior: contain;
@@ -1113,7 +1121,8 @@
 
 <!-- Day popover (anchored to the clicked day) -->
 <div class="daypop" id="dayPop" role="dialog" aria-label="Events on this day" hidden>
-  <div class="dp-head">
+  <div class="dp-head" id="dpHead" title="Drag to move">
+    <span class="dp-grip" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span>
     <h3 class="dp-title" id="dpTitle"></h3>
     <button class="dp-close" id="dpClose" type="button" aria-label="Close">×</button>
   </div>
@@ -1969,6 +1978,7 @@
   var dpSel = -1; // keyboard-selected row index
 
   var dpRect = null;   // anchor cell rect, kept so the popover can re-place when a row expands
+  var dpMoved = false; // dragged by its header → keep that spot (just clamp) until it closes
   function openDayPop(key, rect) {
     var evs = byDate[key] || [];
     if (!evs.length) return;
@@ -2005,6 +2015,7 @@
   function placePop() {
     var pop = document.getElementById("dayPop");
     if (!dpRect) return;
+    if (dpMoved && !pop.hidden) { clampPop(true); return; }
     pop.hidden = false;
     pop.style.visibility = "hidden";
     pop.style.left = "0px";
@@ -2024,21 +2035,66 @@
     pop.style.visibility = "visible";
   }
   // Lightweight re-clamp after a row expands: keep the (now taller) popover on-screen.
-  function clampPop() {
+  // loose (after a drag): it may slide partly off the bottom or sides, so you can push it
+  // aside to see the grid, but the header always stays on-screen to grab it back.
+  function clampPop(loose) {
     var pop = document.getElementById("dayPop");
     if (pop.hidden) return;
     var r = pop.getBoundingClientRect();
-    var vh = window.innerHeight, M = 12;
-    var top = parseFloat(pop.style.top);
+    var vw = window.innerWidth, vh = window.innerHeight, M = 12;
+    var top = parseFloat(pop.style.top), left = parseFloat(pop.style.left);
     if (isNaN(top)) top = r.top;
+    if (isNaN(left)) left = r.left;
+    if (loose) {
+      var head = document.getElementById("dpHead").offsetHeight, KX = Math.min(140, r.width);
+      pop.style.top = Math.max(M, Math.min(top, vh - head - 40)) + "px";
+      pop.style.left = Math.max(KX - r.width, Math.min(left, vw - KX)) + "px";
+      return;
+    }
     if (r.height >= vh - 2 * M) top = M;                     // taller than viewport → pin top, inner scroll
     else if (top + r.height > vh - M) top = vh - M - r.height;
     if (top < M) top = M;
+    left = Math.max(M, Math.min(left, vw - M - r.width));
     pop.style.top = top + "px";
+    pop.style.left = left + "px";
   }
   function closeDayPop() {
     var p = document.getElementById("dayPop");
+    dpMoved = false;                                         // next open re-anchors to its day
     if (!p.hidden) { p.hidden = true; dpSel = -1; }
+  }
+  // Drag the popover by its header. Pointer events cover mouse, touch and pen;
+  // the header has touch-action: none so a finger drag moves it instead of the page.
+  function wireDayPopDrag() {
+    var pop = document.getElementById("dayPop"), head = document.getElementById("dpHead");
+    var drag = null;
+    head.addEventListener("pointerdown", function (e) {
+      if (e.button !== 0 || e.target.closest(".dp-close")) return;
+      var r = pop.getBoundingClientRect();
+      drag = { id: e.pointerId, dx: e.clientX - r.left, dy: e.clientY - r.top };
+      head.setPointerCapture(e.pointerId);
+      pop.classList.add("dragging");
+      e.preventDefault();
+    });
+    head.addEventListener("pointermove", function (e) {
+      if (!drag || e.pointerId !== drag.id) return;
+      pop.style.left = (e.clientX - drag.dx) + "px";
+      pop.style.top = (e.clientY - drag.dy) + "px";
+      dpMoved = true;
+      clampPop(true);
+    });
+    function end(e) {
+      if (!drag || e.pointerId !== drag.id) return;
+      drag = null;
+      pop.classList.remove("dragging");
+    }
+    head.addEventListener("pointerup", end);
+    head.addEventListener("pointercancel", end);
+    // double-click / double-tap the header to snap back next to its day
+    head.addEventListener("dblclick", function (e) {
+      if (e.target.closest(".dp-close")) return;
+      dpMoved = false; placePop();
+    });
   }
   function dpOpen() { return !document.getElementById("dayPop").hidden; }
   function dpMove(delta) {
@@ -2129,6 +2185,7 @@
     document.getElementById("pickCancel").addEventListener("click", closePicker);
     document.getElementById("pickConfirm").addEventListener("click", confirmPicker);
     document.getElementById("dpClose").addEventListener("click", closeDayPop);
+    wireDayPopDrag();
 
     // picker overlay click-out
     document.getElementById("pickerOverlay").addEventListener("click", function (e) {
